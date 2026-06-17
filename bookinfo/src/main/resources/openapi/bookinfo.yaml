@@ -1,0 +1,142 @@
+openapi: 3.0.3
+info:
+  title: Bookinfo API
+  version: 1.0.0
+  description: REST API for managing book information.
+servers:
+  - url: http://localhost:8080
+paths:
+  /books:
+    get:
+      operationId: getBooks
+      summary: Get all books
+      responses:
+        "200":
+          description: List of books
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Book"
+    post:
+      operationId: addBook
+      summary: Add a book
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Book"
+      responses:
+        "201":
+          description: Created book
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Book"
+        "400":
+          description: Invalid book payload
+  /books/{identifier}:
+    get:
+      operationId: getBookByIsbn
+      summary: Get a book by ISBN
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          description: Book ISBN.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Book matching the ISBN
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Book"
+        "404":
+          description: Book not found
+    put:
+      operationId: updateBook
+      summary: Update a book by UUID
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          description: Book UUID.
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Book"
+      responses:
+        "200":
+          description: Updated book
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Book"
+        "400":
+          description: Invalid book payload or UUID
+        "404":
+          description: Book not found
+    delete:
+      operationId: deleteBook
+      summary: Delete a book by UUID
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          description: Book UUID.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Book deleted
+        "400":
+          description: Invalid UUID
+        "404":
+          description: Book not found
+components:
+  schemas:
+    Book:
+      type: object
+      required:
+        - isbn
+        - title
+        - author
+        - pages
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Application-generated unique id.
+          example: 550e8400-e29b-41d4-a716-446655440000
+        isbn:
+          type: string
+          description: International Standard Book Number.
+          minLength: 1
+          x-field-extra-annotation: "@field:jakarta.validation.constraints.NotBlank"
+          example: "9780134685991"
+        title:
+          type: string
+          minLength: 1
+          x-field-extra-annotation: "@field:jakarta.validation.constraints.NotBlank"
+          example: Effective Java
+        author:
+          type: string
+          minLength: 1
+          x-field-extra-annotation: "@field:jakarta.validation.constraints.NotBlank"
+          example: Joshua Bloch
+        pages:
+          type: integer
+          format: int32
+          minimum: 1
+          x-field-extra-annotation: "@field:jakarta.validation.constraints.Min(1)"
+          example: 416

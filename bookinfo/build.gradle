@@ -1,0 +1,170 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
+plugins {
+    alias(libs.plugins.springBoot)
+    alias(libs.plugins.springDependencyManagement)
+    alias(libs.plugins.kotlinJvm)
+    alias(libs.plugins.kotlinSpring)
+    alias(libs.plugins.kotlinKapt)
+    alias(libs.plugins.openapiGenerator)
+    alias(libs.plugins.ktlint)
+    id 'jacoco'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+description = 'Book information service'
+
+def generatedSourcesDir = layout.projectDirectory.dir('src/generated')
+def generatedKotlinDir = generatedSourcesDir.dir('kotlin')
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+kotlin {
+    jvmToolchain(21)
+
+    sourceSets {
+        main {
+            kotlin.srcDir(generatedKotlinDir.asFile)
+        }
+    }
+}
+
+dependencies {
+    implementation libs.springBootStarterActuator
+    implementation libs.springBootStarterDataMongodb
+    implementation libs.springBootStarterValidation
+    implementation libs.springBootStarterWebmvc
+    implementation libs.jacksonModuleKotlin
+    implementation libs.jacksonAnnotations
+    implementation libs.kotlinReflect
+    implementation libs.mapstruct
+
+    kapt libs.mapstructProcessor
+
+    testImplementation libs.springBootStarterTest
+    testImplementation libs.springBootStarterWebmvcTest
+    testImplementation libs.mockitoKotlin
+    testImplementation libs.testcontainersJunitJupiter
+    testImplementation libs.testcontainersMongodb
+    testRuntimeOnly libs.junitPlatformLauncher
+}
+
+kapt {
+    correctErrorTypes = true
+}
+
+ktlint {
+    filter {
+        exclude { fileTreeElement ->
+            fileTreeElement.file.toPath().startsWith(generatedSourcesDir.asFile.toPath())
+        }
+    }
+}
+
+openApiGenerate {
+    generatorName.set('kotlin')
+    inputSpec.set(layout.projectDirectory.file('src/main/resources/openapi/bookinfo.yaml').asFile.absolutePath)
+    outputDir.set(generatedSourcesDir.asFile.absolutePath)
+    packageName.set('com.example.bookinfo.api')
+    modelPackage.set('com.example.bookinfo.api.model')
+    globalProperties.set([
+            models    : '',
+            modelDocs : 'false',
+            modelTests: 'false',
+    ])
+    configOptions.set([
+            dateLibrary         : 'java8',
+            serializationLibrary: 'jackson',
+            sourceFolder        : 'kotlin',
+    ])
+}
+
+tasks.named('clean', Delete) {
+    delete generatedSourcesDir
+}
+
+tasks.named('compileKotlin') {
+    dependsOn 'openApiGenerate'
+}
+
+tasks.matching { it.name in ['kaptKotlin', 'kaptGenerateStubsKotlin'] }.configureEach {
+    dependsOn 'openApiGenerate'
+}
+
+tasks.matching { it.name in ['runKtlintCheckOverMainSourceSet', 'runKtlintFormatOverMainSourceSet'] }.configureEach {
+    dependsOn tasks.named('openApiGenerate')
+}
+
+tasks.named('compileTestKotlin') {
+    dependsOn 'openApiGenerate'
+}
+
+tasks.withType(KotlinCompile).configureEach {
+    compilerOptions {
+        freeCompilerArgs.add('-Xjsr305=strict')
+    }
+}
+
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
+    finalizedBy tasks.named('jacocoTestReport')
+}
+
+def coverageExclusions = [
+        'com/example/bookinfo/api/model/**',
+        'com/example/bookinfo/BookinfoApplication.class',
+        'com/example/bookinfo/BookinfoApplicationKt.class',
+]
+
+tasks.named('jacocoTestReport', JacocoReport).configure {
+    dependsOn tasks.named('test')
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+
+    classDirectories.setFrom(
+            files(
+                    classDirectories.files.collect {
+                        fileTree(it) {
+                            exclude coverageExclusions
+                        }
+                    }
+            )
+    )
+}
+
+tasks.named('jacocoTestCoverageVerification', JacocoCoverageVerification).configure {
+    dependsOn tasks.named('test')
+
+    classDirectories.setFrom(
+            files(
+                    classDirectories.files.collect {
+                        fileTree(it) {
+                            exclude coverageExclusions
+                        }
+                    }
+            )
+    )
+
+    violationRules {
+        rule {
+            limit {
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+                minimum = 0.9
+            }
+        }
+    }
+}
+
+tasks.named('check') {
+    dependsOn tasks.named('ktlintCheck')
+    dependsOn tasks.named('jacocoTestCoverageVerification')
+}

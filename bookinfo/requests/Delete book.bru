@@ -1,0 +1,19 @@
+meta {
+  name: Delete book
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{baseUrl}}/books/:uuid
+  body: none
+  auth: none
+}
+
+params:path {
+  uuid: {{bookUuid}}
+}
+
+headers {
+  Accept: application/json
+}

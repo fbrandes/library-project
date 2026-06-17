@@ -1,0 +1,29 @@
+meta {
+  name: Update book
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{baseUrl}}/books/:uuid
+  body: json
+  auth: none
+}
+
+params:path {
+  uuid: {{bookUuid}}
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "isbn": "{{isbn}}",
+    "title": "Effective Java, 3rd Edition",
+    "author": "Joshua Bloch",
+    "pages": 416
+  }
+}

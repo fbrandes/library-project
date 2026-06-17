@@ -1,0 +1,40 @@
+services:
+  bookinfo:
+    build:
+      context: ./bookinfo
+    environment:
+      SPRING_MONGODB_URI: >-
+        mongodb://${BOOKINFO_MONGO_USERNAME:-bookinfo}:${BOOKINFO_MONGO_PASSWORD:-bookinfo}@mongodb:27017/bookinfo?authSource=admin
+      SPRING_MONGODB_DATABASE: bookinfo
+    ports:
+      - "8080:8080"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+
+  mongodb:
+    image: mongo:8.2@sha256:49f1d7b87c2ddf918372be5defe7edff8c46703d0b2a56023a3f825e32e1250c
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${BOOKINFO_MONGO_USERNAME:-bookinfo}
+      MONGO_INITDB_ROOT_PASSWORD: ${BOOKINFO_MONGO_PASSWORD:-bookinfo}
+      MONGO_INITDB_DATABASE: bookinfo
+    ports:
+      - "127.0.0.1:27017:27017"
+    volumes:
+      - mongodb-data:/data/db
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          mongosh --quiet
+          -u "$${MONGO_INITDB_ROOT_USERNAME}"
+          -p "$${MONGO_INITDB_ROOT_PASSWORD}"
+          --authenticationDatabase admin
+          --eval "db.adminCommand('ping').ok"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  mongodb-data:

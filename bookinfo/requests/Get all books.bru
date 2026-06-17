@@ -1,0 +1,15 @@
+meta {
+  name: Get all books
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/books
+  body: none
+  auth: none
+}
+
+headers {
+  Accept: application/json
+}

@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: bookinfo
+  mongodb:
+    representation:
+      uuid: standard
+    database: bookinfo
+management:
+  endpoints:
+    web:
+      base-path: /
+      exposure:
+        include: health,info
