@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
+import tty from 'node:tty';
 import { spawnSync } from 'node:child_process';
 import inquirer from 'inquirer';
 
@@ -18,6 +19,11 @@ const COMMIT_TYPES = [
 ];
 
 const AREA_OPTIONS = ['', 'backend', 'frontend'];
+const SELECT_PROMPT_THEME = {
+  style: {
+    keysHelpTip: () => undefined,
+  },
+};
 
 const [, , messageFile, source] = process.argv;
 
@@ -158,24 +164,37 @@ function toChoice(option) {
   };
 }
 
+function createSelectQuestion({ choices, defaultValue, message, name }) {
+  return {
+    type: 'select',
+    name,
+    message,
+    choices,
+    default: defaultValue,
+    pageSize: choices.length,
+    theme: SELECT_PROMPT_THEME,
+  };
+}
+
 function createPrompt() {
   try {
-    const ttyFd = fs.openSync('/dev/tty', 'r+');
-    const input = fs.createReadStream(null, { fd: ttyFd, autoClose: false });
-    const output = fs.createWriteStream(null, { fd: ttyFd, autoClose: false });
+    const inputFd = fs.openSync('/dev/tty', 'r');
+    const outputFd = fs.openSync('/dev/tty', 'w');
+    const input = new tty.ReadStream(inputFd);
+    const output = new tty.WriteStream(outputFd);
 
     return {
       close: () => {
         input.destroy();
         output.end();
-        fs.closeSync(ttyFd);
+        fs.closeSync(inputFd);
+        fs.closeSync(outputFd);
       },
       prompt: inquirer.createPromptModule({
         input,
         output,
         skipTTYChecks: true,
       }),
-      write: (text) => fs.writeSync(ttyFd, text),
     };
   } catch {
     if (process.stdin.isTTY && process.stdout.isTTY) {
@@ -186,7 +205,6 @@ function createPrompt() {
           output: process.stdout,
           skipTTYChecks: true,
         }),
-        write: (text) => process.stdout.write(text),
       };
     }
 
@@ -194,82 +212,113 @@ function createPrompt() {
   }
 }
 
-async function main() {
+function writeTerminal(text) {
+  try {
+    const outputFd = fs.openSync('/dev/tty', 'w');
+    fs.writeSync(outputFd, text);
+    fs.closeSync(outputFd);
+  } catch {
+    if (process.stdout.isTTY) {
+      process.stdout.write(text);
+    }
+  }
+}
+
+async function askQuestion(question) {
   const promptContext = createPrompt();
 
   if (!promptContext) {
-    process.exit(0);
+    return null;
   }
 
   try {
-    const originalMessage = fs.readFileSync(messageFile, 'utf8');
-    const messageLines = originalMessage.split(/\r?\n/);
-    const parsed = parseSubject(messageLines[0] ?? '');
-    const stagedPaths = getStagedPaths();
-    const detectedServices = detectServices(stagedPaths);
-    const knownServices = discoverServices();
-    const detectedAreas = detectAreas(stagedPaths);
-    const serviceOptions = [
-      '',
-      ...new Set([parsed.scope, ...detectedServices, ...knownServices].filter(Boolean)),
-    ];
-    const defaultService =
-      parsed.scope || (detectedServices.length === 1 ? detectedServices[0] : '');
-    const defaultArea =
-      parsed.area || (detectedAreas.length === 1 ? detectedAreas[0] : '');
-    const defaultType = parsed.type || 'feat';
+    return await promptContext.prompt([question]);
+  } finally {
+    promptContext.close();
+  }
+}
 
-    promptContext.write('\nPrepare commit message\n');
-    promptContext.write(`Current subject: ${parsed.subject || '(empty)'}\n`);
+async function main() {
+  const originalMessage = fs.readFileSync(messageFile, 'utf8');
+  const messageLines = originalMessage.split(/\r?\n/);
+  const parsed = parseSubject(messageLines[0] ?? '');
+  const stagedPaths = getStagedPaths();
+  const detectedServices = detectServices(stagedPaths);
+  const knownServices = discoverServices();
+  const detectedAreas = detectAreas(stagedPaths);
+  const serviceOptions = [
+    '',
+    ...new Set([parsed.scope, ...detectedServices, ...knownServices].filter(Boolean)),
+  ];
+  const defaultService =
+    parsed.scope || (detectedServices.length === 1 ? detectedServices[0] : '');
+  const defaultArea =
+    parsed.area || (detectedAreas.length === 1 ? detectedAreas[0] : '');
+  const defaultType = parsed.type || 'feat';
 
-    const answers = await promptContext.prompt([
-      {
-        type: 'select',
-        name: 'type',
-        message: 'Type of change',
-        choices: COMMIT_TYPES,
-        default: defaultType,
-      },
-      {
-        type: 'select',
-        name: 'scope',
-        message: 'Changed service',
-        choices: serviceOptions.map(toChoice),
-        default: defaultService,
-      },
-      {
-        type: 'select',
-        name: 'area',
-        message: 'Changed area',
-        choices: AREA_OPTIONS.map(toChoice),
-        default: defaultArea,
-      },
-      {
+  writeTerminal('\nPrepare commit message\n');
+  writeTerminal(`Current subject: ${parsed.subject || '(empty)'}\n`);
+
+  const typeAnswer = await askQuestion(createSelectQuestion({
+    name: 'type',
+    message: 'Type of change',
+    choices: COMMIT_TYPES,
+    defaultValue: defaultType,
+  }));
+
+  if (!typeAnswer) {
+    process.exit(0);
+  }
+
+  const scopeAnswer = await askQuestion(createSelectQuestion({
+    name: 'scope',
+    message: 'Changed service',
+    choices: serviceOptions.map(toChoice),
+    defaultValue: defaultService,
+  }));
+
+  if (!scopeAnswer) {
+    process.exit(0);
+  }
+
+  const areaAnswer = await askQuestion(createSelectQuestion({
+    name: 'area',
+    message: 'Changed area',
+    choices: AREA_OPTIONS.map(toChoice),
+    defaultValue: defaultArea,
+  }));
+
+  if (!areaAnswer) {
+    process.exit(0);
+  }
+
+  const subjectAnswer = parsed.subject
+    ? { subject: parsed.subject }
+    : await askQuestion({
         type: 'input',
         name: 'subject',
         message: 'Subject',
         default: parsed.subject,
-        when: !parsed.subject,
-      },
-    ]);
+      });
 
-    const subject = (answers.subject ?? parsed.subject).trim();
-
-    if (!subject) {
-      promptContext.write('Commit subject is empty; leaving message unchanged.\n');
-      return;
-    }
-
-    messageLines[0] = buildCommitHeader({
-      area: answers.area,
-      scope: answers.scope,
-      subject,
-      type: answers.type,
-    });
-    fs.writeFileSync(messageFile, messageLines.join('\n'));
-  } finally {
-    promptContext.close();
+  if (!subjectAnswer) {
+    process.exit(0);
   }
+
+  const subject = subjectAnswer.subject.trim();
+
+  if (!subject) {
+    writeTerminal('Commit subject is empty; leaving message unchanged.\n');
+    return;
+  }
+
+  messageLines[0] = buildCommitHeader({
+    area: areaAnswer.area,
+    scope: scopeAnswer.scope,
+    subject,
+    type: typeAnswer.type,
+  });
+  fs.writeFileSync(messageFile, messageLines.join('\n'));
 }
 
 await main();
