@@ -33,6 +33,6 @@ For a manually managed MongoDB instance, configure `SPRING_MONGODB_URI` and run:
 ./gradlew bootRun
 ```
 
-The REST API is described in `src/main/resources/openapi/bookinfo.yaml`. API model
+The REST API is described in `../../api/spec/bookinfo.yml`. API model
 classes are generated into `src/generated` during the Gradle build. `./gradlew clean`
 deletes that generated directory.

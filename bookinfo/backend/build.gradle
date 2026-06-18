@@ -69,7 +69,7 @@ ktlint {
 
 openApiGenerate {
     generatorName = 'kotlin'
-    inputSpec = file('src/main/resources/openapi/bookinfo.yaml').path.replace('\\', '/')
+    inputSpec = file('../../api/spec/bookinfo.yml').path.replace('\\', '/')
     outputDir = generatedSourcesDir.asFile.absolutePath
     packageName = 'com.example.bookinfo.api'
     modelPackage = 'com.example.bookinfo.api.model'

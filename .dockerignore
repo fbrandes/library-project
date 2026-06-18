@@ -1,0 +1,10 @@
+.git/
+.gradle/
+.idea/
+.pnpm-store/
+node_modules/
+**/.gradle/
+**/build/
+**/dist/
+**/node_modules/
+**/src/generated/

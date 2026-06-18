@@ -9,7 +9,8 @@ services:
 
   bookinfo:
     build:
-      context: ./bookinfo
+      context: ..
+      dockerfile: bookinfo/backend/Dockerfile
     environment:
       SPRING_MONGODB_URI: >-
         mongodb://${BOOKINFO_MONGO_USERNAME:-bookinfo}:${BOOKINFO_MONGO_PASSWORD:-bookinfo}@mongodb:27017/bookinfo?authSource=admin

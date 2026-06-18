@@ -2,13 +2,16 @@ FROM eclipse-temurin:21-jdk@sha256:949f7645022e8cd5cd65eac4b342e7505c86b721b6338
 
 WORKDIR /workspace
 
-COPY gradlew gradlew
-COPY gradle gradle
-COPY settings.gradle build.gradle gradle.properties ./
+WORKDIR /workspace/bookinfo/backend
+
+COPY bookinfo/backend/gradlew gradlew
+COPY bookinfo/backend/gradle gradle
+COPY bookinfo/backend/settings.gradle bookinfo/backend/build.gradle bookinfo/backend/gradle.properties ./
+COPY api/spec/bookinfo.yml /workspace/api/spec/bookinfo.yml
 
 RUN sh ./gradlew --no-daemon dependencies
 
-COPY src src
+COPY bookinfo/backend/src src
 
 RUN sh ./gradlew --no-daemon bootJar
 
@@ -19,7 +22,7 @@ WORKDIR /app
 RUN groupadd --system --gid 1001 spring \
     && useradd --system --uid 1001 --gid spring --home-dir /app --shell /usr/sbin/nologin spring
 
-COPY --from=build --chown=1001:1001 /workspace/build/libs/bookinfo-0.0.1-SNAPSHOT.jar /app/bookinfo.jar
+COPY --from=build --chown=1001:1001 /workspace/bookinfo/backend/build/libs/bookinfo-0.0.1-SNAPSHOT.jar /app/bookinfo.jar
 
 USER 1001:1001
 
