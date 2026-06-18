@@ -76,7 +76,6 @@ openApiGenerate {
     globalProperties = ([
             models    : '',
             modelDocs : 'false',
-            modelTests: 'true',
     ])
     configOptions = ([
             dateLibrary         : 'java8',

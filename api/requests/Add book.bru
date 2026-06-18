@@ -19,9 +19,29 @@ body:json {
   {
     "isbn": "{{isbn}}",
     "title": "{{$randomWords}}",
-    "author": "{{$randomFullName}}",
-    "pages": {{$randomInt}}
+    "author": {
+      "firstname": "{{$randomFirstName}}",
+      "middlename": "",
+      "lastname": "{{$randomLastName}}",
+      "bio": "{{$randomLoremParagraph}}"
+    },
+    "pages": {{$randomInt}},
+    "publisher": {
+      "name": "{{$randomCompanyName}}",
+      "address": {
+        "street": "{{$randomStreetName}}",
+        "zipCode": "{{$randomInt}}",
+        "city": "{{$randomCity}}"
+      }
+    },
+    "genres": {{genres}}
+    "language": "English",
+    "summary": "{{$randomLoremParagraph}}",
+    "publicationDate": "{{publicationDate}}",
+    "edition": 1,
+    "type": ""
   }
+  
 }
 
 script:pre-request {
@@ -64,7 +84,44 @@ script:pre-request {
     return `${prefix}-${group}-${registrant}-${publication}-${checkDigit}`;
   }
   
+  function randomIntBetween(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+  
+  function randomGenres() {
+    const availableGenres = [
+      "Fantasy",
+      "Science Fiction",
+      "Mystery",
+      "Thriller",
+      "Romance",
+      "Historical Fiction",
+      "Horror",
+      "Biography",
+      "Nonfiction",
+      "Young Adult"
+    ];
+  
+    const amount = randomIntBetween(1, 3);
+    const shuffled = [...availableGenres].sort(() => Math.random() - 0.5);
+  
+    return shuffled.slice(0, amount);
+  }
+  function randomDateString(startYear = 1950, endYear = 2026) {
+    const start = new Date(`${startYear}-01-01T00:00:00Z`);
+    const end = new Date(`${endYear}-12-31T00:00:00Z`);
+  
+    const randomTime =
+      start.getTime() + Math.random() * (end.getTime() - start.getTime());
+  
+    return new Date(randomTime).toISOString().slice(0, 10);
+  }
+  
+  bru.setVar("publicationDate", randomDateString());
+  bru.setVar("genres", JSON.stringify(randomGenres()));
   bru.setVar("isbn", randomDashedIsbn13());
+  bru.setVar("edition", randomIntBetween(1, 3))
+  bru.setVar("type", randomChoice(['HARDCOVER', 'SOFTCOVER', 'EBOOK']))
 }
 
 script:post-response {

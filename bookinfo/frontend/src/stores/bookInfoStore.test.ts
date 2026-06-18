@@ -2,22 +2,10 @@ import { describe, expect, it, vi } from 'vitest';
 
 import type { BookApi } from '../services/bookApi';
 import type { Book } from '../types/book';
+import { domainDrivenDesign, effectiveJava } from '../test/bookFixtures';
 import { createBookInfoStore, filterBooks, getPreferredThemeMode } from './bookInfoStore';
 
-const books: Book[] = [
-  {
-    author: 'Joshua Bloch',
-    isbn: '9780134685991',
-    pages: 416,
-    title: 'Effective Java',
-  },
-  {
-    author: 'Eric Evans',
-    isbn: '9780321125217',
-    pages: 560,
-    title: 'Domain-Driven Design',
-  },
-];
+const books: Book[] = [effectiveJava, domainDrivenDesign];
 
 function createMockApi(): BookApi {
   return {

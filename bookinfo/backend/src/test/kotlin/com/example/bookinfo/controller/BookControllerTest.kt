@@ -1,8 +1,10 @@
 package com.example.bookinfo.controller
 
-import com.example.bookinfo.api.model.Book
 import com.example.bookinfo.service.BookNotFoundException
 import com.example.bookinfo.service.BookService
+import com.example.bookinfo.testBook
+import com.example.bookinfo.testBookJson
+import com.example.bookinfo.testBookUuid
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.never
@@ -22,7 +24,6 @@ import org.springframework.test.web.servlet.delete
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.put
-import java.util.UUID
 
 @SpringBootTest(classes = [BookControllerTest.TestApplication::class])
 @AutoConfigureMockMvc
@@ -32,11 +33,11 @@ class BookControllerTest(
     @MockitoBean
     private lateinit var bookService: BookService
 
-    private val bookUuid = UUID.fromString("550e8400-e29b-41d4-a716-446655440000")
+    private val bookUuid = testBookUuid
 
     @Test
     fun `getBooks returns all books`() {
-        val books = listOf(book())
+        val books = listOf(testBook())
         whenever(bookService.getBooks()).thenReturn(books)
 
         mockMvc
@@ -47,8 +48,17 @@ class BookControllerTest(
                 jsonPath("$[0].id") { value(bookUuid.toString()) }
                 jsonPath("$[0].isbn") { value("9780134685991") }
                 jsonPath("$[0].title") { value("Effective Java") }
-                jsonPath("$[0].author") { value("Joshua Bloch") }
+                jsonPath("$[0].author.firstname") { value("Joshua") }
+                jsonPath("$[0].author.lastname") { value("Bloch") }
                 jsonPath("$[0].pages") { value(416) }
+                jsonPath("$[0].publisher.name") { value("Addison-Wesley Professional") }
+                jsonPath("$[0].publisher.address.city") { value("Boston") }
+                jsonPath("$[0].genres[0]") { value("Programming") }
+                jsonPath("$[0].language") { value("English") }
+                jsonPath("$[0].summary") { value("A practical guide to writing robust Java code.") }
+                jsonPath("$[0].publicationDate") { value("2018-01-06") }
+                jsonPath("$[0].edition") { value(3) }
+                jsonPath("$[0].type") { value("hardcover") }
             }
 
         verify(bookService).getBooks()
@@ -56,7 +66,7 @@ class BookControllerTest(
 
     @Test
     fun `getBookByIsbn returns a matching book`() {
-        val book = book()
+        val book = testBook()
         whenever(bookService.getBookByIsbn("9780134685991")).thenReturn(book)
 
         mockMvc
@@ -67,8 +77,17 @@ class BookControllerTest(
                 jsonPath("$.id") { value(bookUuid.toString()) }
                 jsonPath("$.isbn") { value("9780134685991") }
                 jsonPath("$.title") { value("Effective Java") }
-                jsonPath("$.author") { value("Joshua Bloch") }
+                jsonPath("$.author.firstname") { value("Joshua") }
+                jsonPath("$.author.lastname") { value("Bloch") }
                 jsonPath("$.pages") { value(416) }
+                jsonPath("$.publisher.name") { value("Addison-Wesley Professional") }
+                jsonPath("$.publisher.address.city") { value("Boston") }
+                jsonPath("$.genres[0]") { value("Programming") }
+                jsonPath("$.language") { value("English") }
+                jsonPath("$.summary") { value("A practical guide to writing robust Java code.") }
+                jsonPath("$.publicationDate") { value("2018-01-06") }
+                jsonPath("$.edition") { value(3) }
+                jsonPath("$.type") { value("hardcover") }
             }
 
         verify(bookService).getBookByIsbn("9780134685991")
@@ -76,30 +95,30 @@ class BookControllerTest(
 
     @Test
     fun `addBook creates a book`() {
-        val request = book(id = null)
-        val created = book(id = bookUuid)
+        val request = testBook(id = null)
+        val created = testBook(id = bookUuid)
         whenever(bookService.addBook(request)).thenReturn(created)
 
         mockMvc
             .post("/books") {
                 contentType = MediaType.APPLICATION_JSON
                 accept = MediaType.APPLICATION_JSON
-                content =
-                    """
-                    {
-                      "isbn": "9780134685991",
-                      "title": "Effective Java",
-                      "author": "Joshua Bloch",
-                      "pages": 416
-                    }
-                    """.trimIndent()
+                content = testBookJson()
             }.andExpect {
                 status { isCreated() }
                 jsonPath("$.id") { value(bookUuid.toString()) }
                 jsonPath("$.isbn") { value("9780134685991") }
                 jsonPath("$.title") { value("Effective Java") }
-                jsonPath("$.author") { value("Joshua Bloch") }
+                jsonPath("$.author.firstname") { value("Joshua") }
+                jsonPath("$.author.lastname") { value("Bloch") }
                 jsonPath("$.pages") { value(416) }
+                jsonPath("$.publisher.name") { value("Addison-Wesley Professional") }
+                jsonPath("$.publisher.address.zipCode") { value("02116") }
+                jsonPath("$.genres[1]") { value("Java") }
+                jsonPath("$.language") { value("English") }
+                jsonPath("$.publicationDate") { value("2018-01-06") }
+                jsonPath("$.edition") { value(3) }
+                jsonPath("$.type") { value("hardcover") }
             }
 
         verify(bookService).addBook(request)
@@ -116,8 +135,27 @@ class BookControllerTest(
                     {
                       "isbn": "",
                       "title": "",
-                      "author": "Joshua Bloch",
-                      "pages": 0
+                      "author": {
+                        "firstname": "",
+                        "middlename": "",
+                        "lastname": "",
+                        "bio": ""
+                      },
+                      "pages": 0,
+                      "publisher": {
+                        "name": "",
+                        "address": {
+                          "street": "",
+                          "zipCode": "",
+                          "city": ""
+                        }
+                      },
+                      "genres": [],
+                      "language": "",
+                      "summary": "",
+                      "publicationDate": "not-a-date",
+                      "edition": 0,
+                      "type": "hardcover"
                     }
                     """.trimIndent()
             }.andExpect {
@@ -129,22 +167,14 @@ class BookControllerTest(
 
     @Test
     fun `addBook returns conflict for duplicate isbn`() {
-        val request = book(id = null)
+        val request = testBook(id = null)
         whenever(bookService.addBook(request)).thenThrow(DuplicateKeyException("duplicate isbn"))
 
         mockMvc
             .post("/books") {
                 contentType = MediaType.APPLICATION_JSON
                 accept = MediaType.APPLICATION_JSON
-                content =
-                    """
-                    {
-                      "isbn": "9780134685991",
-                      "title": "Effective Java",
-                      "author": "Joshua Bloch",
-                      "pages": 416
-                    }
-                    """.trimIndent()
+                content = testBookJson()
             }.andExpect {
                 status { isConflict() }
                 jsonPath("$.message") { value("Book with ISBN already exists") }
@@ -155,30 +185,28 @@ class BookControllerTest(
 
     @Test
     fun `updateBook updates a book by uuid`() {
-        val request = book(id = null, title = "Effective Java, 3rd Edition")
-        val updated = book(id = bookUuid, title = "Effective Java, 3rd Edition")
+        val request = testBook(id = null, title = "Effective Java, 3rd Edition")
+        val updated = testBook(id = bookUuid, title = "Effective Java, 3rd Edition")
         whenever(bookService.updateBook(bookUuid, request)).thenReturn(updated)
 
         mockMvc
             .put("/books/$bookUuid") {
                 contentType = MediaType.APPLICATION_JSON
                 accept = MediaType.APPLICATION_JSON
-                content =
-                    """
-                    {
-                      "isbn": "9780134685991",
-                      "title": "Effective Java, 3rd Edition",
-                      "author": "Joshua Bloch",
-                      "pages": 416
-                    }
-                    """.trimIndent()
+                content = testBookJson(title = "Effective Java, 3rd Edition")
             }.andExpect {
                 status { isOk() }
                 jsonPath("$.id") { value(bookUuid.toString()) }
                 jsonPath("$.isbn") { value("9780134685991") }
                 jsonPath("$.title") { value("Effective Java, 3rd Edition") }
-                jsonPath("$.author") { value("Joshua Bloch") }
+                jsonPath("$.author.firstname") { value("Joshua") }
+                jsonPath("$.author.lastname") { value("Bloch") }
                 jsonPath("$.pages") { value(416) }
+                jsonPath("$.publisher.name") { value("Addison-Wesley Professional") }
+                jsonPath("$.language") { value("English") }
+                jsonPath("$.publicationDate") { value("2018-01-06") }
+                jsonPath("$.edition") { value(3) }
+                jsonPath("$.type") { value("hardcover") }
             }
 
         verify(bookService).updateBook(bookUuid, request)
@@ -190,15 +218,7 @@ class BookControllerTest(
             .put("/books/not-a-uuid") {
                 contentType = MediaType.APPLICATION_JSON
                 accept = MediaType.APPLICATION_JSON
-                content =
-                    """
-                    {
-                      "isbn": "9780134685991",
-                      "title": "Effective Java",
-                      "author": "Joshua Bloch",
-                      "pages": 416
-                    }
-                    """.trimIndent()
+                content = testBookJson()
             }.andExpect {
                 status { isBadRequest() }
             }
@@ -233,17 +253,6 @@ class BookControllerTest(
 
         verify(bookService).getBookByIsbn("missing")
     }
-
-    private fun book(
-        id: UUID? = bookUuid,
-        title: String = "Effective Java",
-    ) = Book(
-        id = id,
-        isbn = "9780134685991",
-        title = title,
-        author = "Joshua Bloch",
-        pages = 416,
-    )
 
     @SpringBootConfiguration
     @EnableAutoConfiguration

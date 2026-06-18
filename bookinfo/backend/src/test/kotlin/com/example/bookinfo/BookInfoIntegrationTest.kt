@@ -34,7 +34,7 @@ class BookInfoIntegrationTest(
 
     @Test
     fun `post book persists it and get book returns it`() {
-        val request = book()
+        val request = testBook()
 
         val createResponse = createBook(request)
 
@@ -52,6 +52,13 @@ class BookInfoIntegrationTest(
         assertThat(persisted?.title).isEqualTo(request.title)
         assertThat(persisted?.author).isEqualTo(request.author)
         assertThat(persisted?.pages).isEqualTo(request.pages)
+        assertThat(persisted?.publisher).isEqualTo(request.publisher)
+        assertThat(persisted?.genres).isEqualTo(request.genres)
+        assertThat(persisted?.language).isEqualTo(request.language)
+        assertThat(persisted?.summary).isEqualTo(request.summary)
+        assertThat(persisted?.publicationDate).isEqualTo(request.publicationDate)
+        assertThat(persisted?.edition).isEqualTo(request.edition)
+        assertThat(persisted?.type).isEqualTo(request.type)
 
         val getResponse =
             restClient
@@ -66,7 +73,7 @@ class BookInfoIntegrationTest(
 
     @Test
     fun `duplicate isbn returns conflict`() {
-        val request = book()
+        val request = testBook()
         createBook(request)
 
         val duplicateStatus =
@@ -89,11 +96,4 @@ class BookInfoIntegrationTest(
             .retrieve()
             .toEntity<Book>()
 
-    private fun book() =
-        Book(
-            isbn = "9780134685991",
-            title = "Effective Java",
-            author = "Joshua Bloch",
-            pages = 416,
-        )
 }

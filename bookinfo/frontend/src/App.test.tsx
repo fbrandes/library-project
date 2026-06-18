@@ -4,23 +4,11 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import App from './App';
 import { bookInfoStore } from './stores/bookInfoStore';
+import { domainDrivenDesign, effectiveJava } from './test/bookFixtures';
 import { renderWithTheme } from './test/renderWithTheme';
 import type { Book } from './types/book';
 
-const books: Book[] = [
-  {
-    author: 'Joshua Bloch',
-    isbn: '9780134685991',
-    pages: 416,
-    title: 'Effective Java',
-  },
-  {
-    author: 'Eric Evans',
-    isbn: '9780321125217',
-    pages: 560,
-    title: 'Domain-Driven Design',
-  },
-];
+const books: Book[] = [effectiveJava, domainDrivenDesign];
 
 function jsonResponse(body: unknown) {
   return new Response(JSON.stringify(body), {

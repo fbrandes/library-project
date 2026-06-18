@@ -2,7 +2,7 @@ import { useStore } from 'zustand';
 import { createStore } from 'zustand/vanilla';
 
 import { bookApi, type BookApi } from '../services/bookApi';
-import type { Book, FilterField, SearchField, ThemeMode } from '../types/book';
+import { getAuthorDisplayName, type Book, type FilterField, type SearchField, type ThemeMode } from '../types/book';
 
 export interface BookInfoState {
   books: Book[];
@@ -58,7 +58,17 @@ export function filterBooks(books: Book[], field: SearchField | FilterField, que
     return books;
   }
 
-  return books.filter((book) => book[field].toLocaleLowerCase().includes(normalizedQuery));
+  return books.filter((book) =>
+    getSearchableBookValue(book, field).toLocaleLowerCase().includes(normalizedQuery),
+  );
+}
+
+function getSearchableBookValue(book: Book, field: SearchField | FilterField): string {
+  if (field === 'author') {
+    return getAuthorDisplayName(book.author);
+  }
+
+  return book[field];
 }
 
 function toUserMessage(error: unknown): string {

@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
+import { domainDrivenDesign, effectiveJava } from '../test/bookFixtures';
 import { ApiError, getBookByIsbn, getBooks } from './bookApi';
 
 function jsonResponse(body: unknown, init?: ResponseInit) {
@@ -14,14 +15,7 @@ function jsonResponse(body: unknown, init?: ResponseInit) {
 
 describe('bookApi', () => {
   it('fetches all books', async () => {
-    const books = [
-      {
-        author: 'Joshua Bloch',
-        isbn: '9780134685991',
-        pages: 416,
-        title: 'Effective Java',
-      },
-    ];
+    const books = [effectiveJava];
     const fetchMock = vi.fn().mockResolvedValue(jsonResponse(books));
     vi.stubGlobal('fetch', fetchMock);
 
@@ -35,12 +29,7 @@ describe('bookApi', () => {
   });
 
   it('fetches a book by ISBN', async () => {
-    const book = {
-      author: 'Eric Evans',
-      isbn: '9780321125217',
-      pages: 560,
-      title: 'Domain-Driven Design',
-    };
+    const book = domainDrivenDesign;
     const fetchMock = vi.fn().mockResolvedValue(jsonResponse(book));
     vi.stubGlobal('fetch', fetchMock);
 

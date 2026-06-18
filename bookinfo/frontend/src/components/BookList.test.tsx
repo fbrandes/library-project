@@ -2,23 +2,11 @@ import { screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
 import type { Book } from '../types/book';
+import { domainDrivenDesign, effectiveJava } from '../test/bookFixtures';
 import { renderWithTheme } from '../test/renderWithTheme';
 import { BookList } from './BookList';
 
-const books: Book[] = [
-  {
-    author: 'Joshua Bloch',
-    isbn: '9780134685991',
-    pages: 416,
-    title: 'Effective Java',
-  },
-  {
-    author: 'Eric Evans',
-    isbn: '9780321125217',
-    pages: 560,
-    title: 'Domain-Driven Design',
-  },
-];
+const books: Book[] = [effectiveJava, domainDrivenDesign];
 
 describe('BookList', () => {
   it('renders a loading state', () => {

@@ -1,9 +1,11 @@
 package com.example.bookinfo.service
 
-import com.example.bookinfo.api.model.Book
 import com.example.bookinfo.mapper.BookMapper
 import com.example.bookinfo.repository.BookEntity
 import com.example.bookinfo.repository.BookRepository
+import com.example.bookinfo.testBook
+import com.example.bookinfo.testBookEntity
+import com.example.bookinfo.testBookUuid
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
@@ -29,14 +31,14 @@ class BookServiceTest {
     @InjectMocks
     private lateinit var bookService: BookService
 
-    private val bookUuid = UUID.fromString("550e8400-e29b-41d4-a716-446655440000")
+    private val bookUuid = testBookUuid
     private val clientSuppliedUuid = UUID.fromString("11111111-1111-4111-8111-111111111111")
     private val missingUuid = UUID.fromString("22222222-2222-4222-8222-222222222222")
 
     @Test
     fun `getBooks returns mapped books`() {
-        val entity = entity()
-        val apiBook = book()
+        val entity = testBookEntity()
+        val apiBook = testBook()
         whenever(bookRepository.findAll()).thenReturn(listOf(entity))
         whenever(bookMapper.toApi(entity)).thenReturn(apiBook)
 
@@ -49,8 +51,8 @@ class BookServiceTest {
 
     @Test
     fun `getBookByIsbn returns mapped book when found`() {
-        val entity = entity()
-        val apiBook = book()
+        val entity = testBookEntity()
+        val apiBook = testBook()
         whenever(bookRepository.findByIsbn("9780134685991")).thenReturn(entity)
         whenever(bookMapper.toApi(entity)).thenReturn(apiBook)
 
@@ -77,10 +79,10 @@ class BookServiceTest {
 
     @Test
     fun `addBook saves mapped book with generated uuid`() {
-        val request = book(id = clientSuppliedUuid)
-        val mappedEntity = entity(id = clientSuppliedUuid)
-        val savedEntity = entity(id = bookUuid)
-        val response = book(id = bookUuid)
+        val request = testBook(id = clientSuppliedUuid)
+        val mappedEntity = testBookEntity(id = clientSuppliedUuid)
+        val savedEntity = testBookEntity(id = bookUuid)
+        val response = testBook(id = bookUuid)
         whenever(bookMapper.toEntity(request)).thenReturn(mappedEntity)
         whenever(bookRepository.save(any<BookEntity>())).thenReturn(savedEntity)
         whenever(bookMapper.toApi(savedEntity)).thenReturn(response)
@@ -101,10 +103,10 @@ class BookServiceTest {
 
     @Test
     fun `updateBook saves mapped book with path uuid`() {
-        val request = book(id = clientSuppliedUuid)
-        val mappedEntity = entity(id = clientSuppliedUuid)
-        val savedEntity = entity(id = bookUuid, title = "Effective Java, 3rd Edition")
-        val response = book(id = bookUuid, title = "Effective Java, 3rd Edition")
+        val request = testBook(id = clientSuppliedUuid)
+        val mappedEntity = testBookEntity(id = clientSuppliedUuid)
+        val savedEntity = testBookEntity(id = bookUuid, title = "Effective Java, 3rd Edition")
+        val response = testBook(id = bookUuid, title = "Effective Java, 3rd Edition")
         whenever(bookRepository.existsById(bookUuid)).thenReturn(true)
         whenever(bookMapper.toEntity(request)).thenReturn(mappedEntity)
         whenever(bookRepository.save(mappedEntity.copy(id = bookUuid))).thenReturn(savedEntity)
@@ -121,7 +123,7 @@ class BookServiceTest {
 
     @Test
     fun `updateBook throws when book does not exist`() {
-        val request = book(id = clientSuppliedUuid)
+        val request = testBook(id = clientSuppliedUuid)
         whenever(bookRepository.existsById(missingUuid)).thenReturn(false)
 
         val exception =
@@ -158,26 +160,4 @@ class BookServiceTest {
         verify(bookRepository).existsById(missingUuid)
         verify(bookRepository, never()).deleteById(any())
     }
-
-    private fun book(
-        id: UUID? = bookUuid,
-        title: String = "Effective Java",
-    ) = Book(
-        id = id,
-        isbn = "9780134685991",
-        title = title,
-        author = "Joshua Bloch",
-        pages = 416,
-    )
-
-    private fun entity(
-        id: UUID? = bookUuid,
-        title: String = "Effective Java",
-    ) = BookEntity(
-        id = id,
-        isbn = "9780134685991",
-        title = title,
-        author = "Joshua Bloch",
-        pages = 416,
-    )
 }
