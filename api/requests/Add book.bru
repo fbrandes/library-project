@@ -18,10 +18,53 @@ headers {
 body:json {
   {
     "isbn": "{{isbn}}",
-    "title": "Effective Java",
-    "author": "Joshua Bloch",
-    "pages": 416
+    "title": "{{$randomWords}}",
+    "author": "{{$randomFullName}}",
+    "pages": {{$randomInt}}
   }
+}
+
+script:pre-request {
+  function randomDigits(length) {
+    return Array.from({ length }, () => Math.floor(Math.random() * 10)).join("");
+  }
+  
+  function randomChoice(values) {
+    return values[Math.floor(Math.random() * values.length)];
+  }
+  
+  function isbn13CheckDigit(first12Digits) {
+    const sum = [...first12Digits].reduce((total, digit, index) => {
+      return total + Number(digit) * (index % 2 === 0 ? 1 : 3);
+    }, 0);
+  
+    return String((10 - (sum % 10)) % 10);
+  }
+  
+  function randomDashedIsbn13() {
+    const prefix = randomChoice(["978", "979"]);
+  
+    const group = randomChoice([
+      "0", "1", "2", "3", "4", "5", "7",
+      "80", "83", "84", "85", "88", "89",
+      "90", "91", "92", "93", "94", "95", "96"
+    ]);
+  
+    const remainingLength = 12 - prefix.length - group.length;
+  
+    const registrantLength = Math.max(2, Math.floor(remainingLength / 2));
+    const publicationLength = remainingLength - registrantLength;
+  
+    const registrant = randomDigits(registrantLength);
+    const publication = randomDigits(publicationLength);
+  
+    const first12Digits = prefix + group + registrant + publication;
+    const checkDigit = isbn13CheckDigit(first12Digits);
+  
+    return `${prefix}-${group}-${registrant}-${publication}-${checkDigit}`;
+  }
+  
+  bru.setVar("isbn", randomDashedIsbn13());
 }
 
 script:post-response {
