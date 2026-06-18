@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
 import { spawnSync } from 'node:child_process';
+import inquirer from 'inquirer';
 
 const COMMIT_TYPES = [
   'build',
@@ -17,7 +18,6 @@ const COMMIT_TYPES = [
 ];
 
 const AREA_OPTIONS = ['', 'backend', 'frontend'];
-const sleepBuffer = new Int32Array(new SharedArrayBuffer(4));
 
 const [, , messageFile, source] = process.argv;
 
@@ -59,6 +59,34 @@ function detectServices(paths) {
     if (path.startsWith('bookinfo-ui/') || path.startsWith('frontend/')) {
       services.add('bookinfo');
     }
+  }
+
+  return [...services].sort();
+}
+
+function discoverServices() {
+  const services = new Set();
+  const entries = fs.readdirSync('.', { withFileTypes: true });
+
+  for (const entry of entries) {
+    if (!entry.isDirectory()) {
+      continue;
+    }
+
+    if (fs.existsSync(`${entry.name}/backend`) || fs.existsSync(`${entry.name}/frontend`)) {
+      services.add(entry.name);
+      continue;
+    }
+
+    const suffixedService = entry.name.match(/^(.+)-(?:backend|frontend)$/);
+
+    if (suffixedService) {
+      services.add(suffixedService[1]);
+    }
+  }
+
+  if (fs.existsSync('bookinfo-ui')) {
+    services.add('bookinfo');
   }
 
   return [...services].sort();
@@ -116,80 +144,6 @@ function formatOptionLabel(option) {
   return option === '' ? '(empty)' : option;
 }
 
-function writeTerminal(terminal, text) {
-  fs.writeSync(terminal.outputFd, text);
-}
-
-function sleep(milliseconds) {
-  Atomics.wait(sleepBuffer, 0, 0, milliseconds);
-}
-
-function readTerminalLine(terminal, prompt) {
-  writeTerminal(terminal, prompt);
-
-  const chunks = [];
-  const buffer = Buffer.alloc(1);
-
-  while (true) {
-    let bytesRead;
-
-    try {
-      bytesRead = fs.readSync(terminal.inputFd, buffer, 0, 1, null);
-    } catch (error) {
-      if (error?.code === 'EAGAIN' || error?.code === 'EINTR') {
-        sleep(20);
-        continue;
-      }
-
-      throw error;
-    }
-
-    if (bytesRead === 0) {
-      break;
-    }
-
-    const character = buffer.toString('utf8', 0, bytesRead);
-
-    if (character === '\n') {
-      break;
-    }
-
-    if (character !== '\r') {
-      chunks.push(character);
-    }
-  }
-
-  return chunks.join('');
-}
-
-function selectOption(terminal, question, options, defaultValue = '') {
-  writeTerminal(terminal, `\n${question}\n`);
-
-  options.forEach((option, index) => {
-    const defaultMarker = option === defaultValue ? ' default' : '';
-    writeTerminal(terminal, `  ${index + 1}. ${formatOptionLabel(option)}${defaultMarker}\n`);
-  });
-
-  while (true) {
-    const answer = readTerminalLine(terminal, 'Select option: ').trim();
-
-    if (!answer && options.includes(defaultValue)) {
-      return defaultValue;
-    }
-
-    const selectedIndex = Number.parseInt(answer, 10);
-    if (Number.isInteger(selectedIndex) && selectedIndex >= 1 && selectedIndex <= options.length) {
-      return options[selectedIndex - 1];
-    }
-
-    if (options.includes(answer)) {
-      return answer;
-    }
-
-    writeTerminal(terminal, `Enter a number from 1 to ${options.length}.\n`);
-  }
-}
-
 function buildCommitHeader({ area, scope, subject, type }) {
   const scopeSegment = scope ? `(${scope})` : '';
   const areaSegment = area ? ` [${area}]` : '';
@@ -197,21 +151,42 @@ function buildCommitHeader({ area, scope, subject, type }) {
   return `${type}${scopeSegment}: ${subject}${areaSegment}`;
 }
 
-function createTerminal() {
+function toChoice(option) {
+  return {
+    name: formatOptionLabel(option),
+    value: option,
+  };
+}
+
+function createPrompt() {
   try {
     const ttyFd = fs.openSync('/dev/tty', 'r+');
+    const input = fs.createReadStream(null, { fd: ttyFd, autoClose: false });
+    const output = fs.createWriteStream(null, { fd: ttyFd, autoClose: false });
 
     return {
-      close: () => fs.closeSync(ttyFd),
-      inputFd: ttyFd,
-      outputFd: ttyFd,
+      close: () => {
+        input.destroy();
+        output.end();
+        fs.closeSync(ttyFd);
+      },
+      prompt: inquirer.createPromptModule({
+        input,
+        output,
+        skipTTYChecks: true,
+      }),
+      write: (text) => fs.writeSync(ttyFd, text),
     };
   } catch {
     if (process.stdin.isTTY && process.stdout.isTTY) {
       return {
         close: () => {},
-        inputFd: process.stdin.fd,
-        outputFd: process.stdout.fd,
+        prompt: inquirer.createPromptModule({
+          input: process.stdin,
+          output: process.stdout,
+          skipTTYChecks: true,
+        }),
+        write: (text) => process.stdout.write(text),
       };
     }
 
@@ -219,10 +194,10 @@ function createTerminal() {
   }
 }
 
-function main() {
-  const terminal = createTerminal();
+async function main() {
+  const promptContext = createPrompt();
 
-  if (!terminal) {
+  if (!promptContext) {
     process.exit(0);
   }
 
@@ -232,32 +207,69 @@ function main() {
     const parsed = parseSubject(messageLines[0] ?? '');
     const stagedPaths = getStagedPaths();
     const detectedServices = detectServices(stagedPaths);
+    const knownServices = discoverServices();
     const detectedAreas = detectAreas(stagedPaths);
-    const serviceOptions = ['', ...new Set([parsed.scope, ...detectedServices].filter(Boolean))];
+    const serviceOptions = [
+      '',
+      ...new Set([parsed.scope, ...detectedServices, ...knownServices].filter(Boolean)),
+    ];
     const defaultService =
       parsed.scope || (detectedServices.length === 1 ? detectedServices[0] : '');
     const defaultArea =
       parsed.area || (detectedAreas.length === 1 ? detectedAreas[0] : '');
     const defaultType = parsed.type || 'feat';
 
-    writeTerminal(terminal, '\nPrepare commit message\n');
-    writeTerminal(terminal, `Current subject: ${parsed.subject || '(empty)'}\n`);
+    promptContext.write('\nPrepare commit message\n');
+    promptContext.write(`Current subject: ${parsed.subject || '(empty)'}\n`);
 
-    const type = selectOption(terminal, 'Type of change', COMMIT_TYPES, defaultType);
-    const scope = selectOption(terminal, 'Changed service', serviceOptions, defaultService);
-    const area = selectOption(terminal, 'Changed area', AREA_OPTIONS, defaultArea);
-    const subject = parsed.subject || readTerminalLine(terminal, '\nSubject: ').trim();
+    const answers = await promptContext.prompt([
+      {
+        type: 'select',
+        name: 'type',
+        message: 'Type of change',
+        choices: COMMIT_TYPES,
+        default: defaultType,
+      },
+      {
+        type: 'select',
+        name: 'scope',
+        message: 'Changed service',
+        choices: serviceOptions.map(toChoice),
+        default: defaultService,
+      },
+      {
+        type: 'select',
+        name: 'area',
+        message: 'Changed area',
+        choices: AREA_OPTIONS.map(toChoice),
+        default: defaultArea,
+      },
+      {
+        type: 'input',
+        name: 'subject',
+        message: 'Subject',
+        default: parsed.subject,
+        when: !parsed.subject,
+      },
+    ]);
+
+    const subject = (answers.subject ?? parsed.subject).trim();
 
     if (!subject) {
-      writeTerminal(terminal, 'Commit subject is empty; leaving message unchanged.\n');
+      promptContext.write('Commit subject is empty; leaving message unchanged.\n');
       return;
     }
 
-    messageLines[0] = buildCommitHeader({ area, scope, subject, type });
+    messageLines[0] = buildCommitHeader({
+      area: answers.area,
+      scope: answers.scope,
+      subject,
+      type: answers.type,
+    });
     fs.writeFileSync(messageFile, messageLines.join('\n'));
   } finally {
-    terminal.close();
+    promptContext.close();
   }
 }
 
-main();
+await main();
