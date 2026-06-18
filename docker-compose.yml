@@ -1,4 +1,12 @@
 services:
+  bookinfo-ui:
+    build:
+      context: ./bookinfo-ui
+    ports:
+      - "5173:80"
+    depends_on:
+      - bookinfo
+
   bookinfo:
     build:
       context: ./bookinfo
@@ -23,14 +31,7 @@ services:
     volumes:
       - mongodb-data:/data/db
     healthcheck:
-      test:
-        - CMD-SHELL
-        - >-
-          mongosh --quiet
-          -u "$${MONGO_INITDB_ROOT_USERNAME}"
-          -p "$${MONGO_INITDB_ROOT_PASSWORD}"
-          --authenticationDatabase admin
-          --eval "db.adminCommand('ping').ok"
+      test: 'mongosh --quiet -u "$${MONGO_INITDB_ROOT_USERNAME}" -p "$${MONGO_INITDB_ROOT_PASSWORD}" --authenticationDatabase admin --eval "db.adminCommand({ ping: 1 }).ok"'
       interval: 10s
       timeout: 5s
       retries: 5
