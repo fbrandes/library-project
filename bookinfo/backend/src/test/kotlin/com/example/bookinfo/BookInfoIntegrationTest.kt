@@ -95,5 +95,4 @@ class BookInfoIntegrationTest(
             .body(book)
             .retrieve()
             .toEntity<Book>()
-
 }

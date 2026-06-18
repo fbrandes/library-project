@@ -9,7 +9,7 @@ import java.time.LocalDate
 import java.util.UUID
 
 @Document(collection = "books")
-data class BookEntity(
+data class BookDocument(
     @Id
     val id: UUID? = null,
     val isbn: String,

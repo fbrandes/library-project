@@ -16,7 +16,13 @@ class BookExceptionHandlerTest {
             )
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
-        assertThat(response.body).isEqualTo(ErrorResponse("Book with ISBN missing was not found"))
+        assertThat(response.body).isEqualTo(
+            ErrorResponse(
+                status = 404,
+                error = "Not Found",
+                message = "Book with ISBN missing was not found",
+            ),
+        )
     }
 
     @Test
@@ -24,6 +30,12 @@ class BookExceptionHandlerTest {
         val response = exceptionHandler.handleDuplicateKey()
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.CONFLICT)
-        assertThat(response.body).isEqualTo(ErrorResponse("Book with ISBN already exists"))
+        assertThat(response.body).isEqualTo(
+            ErrorResponse(
+                status = 409,
+                error = "Conflict",
+                message = "Book with ISBN already exists",
+            ),
+        )
     }
 }

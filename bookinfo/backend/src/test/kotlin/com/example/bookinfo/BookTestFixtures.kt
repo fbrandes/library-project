@@ -5,7 +5,7 @@ import com.example.bookinfo.api.model.Author
 import com.example.bookinfo.api.model.Book
 import com.example.bookinfo.api.model.BookType
 import com.example.bookinfo.api.model.Publisher
-import com.example.bookinfo.repository.BookEntity
+import com.example.bookinfo.repository.BookDocument
 import java.time.LocalDate
 import java.util.UUID
 
@@ -45,13 +45,13 @@ fun testBook(
     summary = "A practical guide to writing robust Java code.",
     publicationDate = LocalDate.parse("2018-01-06"),
     edition = 3,
-    type = BookType.hardcover,
+    type = BookType.HARDCOVER,
 )
 
 fun testBookEntity(
     id: UUID? = testBookUuid,
     title: String = "Effective Java",
-) = BookEntity(
+) = BookDocument(
     id = id,
     isbn = "9780134685991",
     title = title,
@@ -63,7 +63,7 @@ fun testBookEntity(
     summary = "A practical guide to writing robust Java code.",
     publicationDate = LocalDate.parse("2018-01-06"),
     edition = 3,
-    type = BookType.hardcover,
+    type = BookType.HARDCOVER,
 )
 
 fun testBookJson(
@@ -77,7 +77,7 @@ fun testBookJson(
     summary: String = "A practical guide to writing robust Java code.",
     publicationDate: String = "2018-01-06",
     edition: Int = 3,
-    type: String = "hardcover",
+    type: String = "HARDCOVER",
 ) = """
     {
       "isbn": "$isbn",

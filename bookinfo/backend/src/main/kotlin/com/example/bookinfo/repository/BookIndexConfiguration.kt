@@ -14,7 +14,7 @@ class BookIndexConfiguration {
     fun bookIndexInitializer(mongoTemplate: MongoTemplate) =
         ApplicationRunner {
             mongoTemplate
-                .indexOps<BookEntity>()
-                .createIndex(Index().on(BookEntity::isbn.name, Sort.Direction.ASC).unique())
+                .indexOps<BookDocument>()
+                .createIndex(Index().on(BookDocument::isbn.name, Sort.Direction.ASC).unique())
         }
 }

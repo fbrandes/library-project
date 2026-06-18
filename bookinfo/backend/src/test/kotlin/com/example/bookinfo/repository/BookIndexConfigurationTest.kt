@@ -24,7 +24,7 @@ class BookIndexConfigurationTest {
 
     @Test
     fun `bookIndexInitializer ensures isbn index`() {
-        whenever(mongoTemplate.indexOps<BookEntity>()).thenReturn(indexOperations)
+        whenever(mongoTemplate.indexOps<BookDocument>()).thenReturn(indexOperations)
 
         BookIndexConfiguration()
             .bookIndexInitializer(mongoTemplate)

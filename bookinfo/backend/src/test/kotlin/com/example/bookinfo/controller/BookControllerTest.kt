@@ -5,6 +5,8 @@ import com.example.bookinfo.service.BookService
 import com.example.bookinfo.testBook
 import com.example.bookinfo.testBookJson
 import com.example.bookinfo.testBookUuid
+import org.hamcrest.Matchers.hasItem
+import org.hamcrest.Matchers.startsWith
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.never
@@ -58,7 +60,7 @@ class BookControllerTest(
                 jsonPath("$[0].summary") { value("A practical guide to writing robust Java code.") }
                 jsonPath("$[0].publicationDate") { value("2018-01-06") }
                 jsonPath("$[0].edition") { value(3) }
-                jsonPath("$[0].type") { value("hardcover") }
+                jsonPath("$[0].type") { value("HARDCOVER") }
             }
 
         verify(bookService).getBooks()
@@ -87,7 +89,7 @@ class BookControllerTest(
                 jsonPath("$.summary") { value("A practical guide to writing robust Java code.") }
                 jsonPath("$.publicationDate") { value("2018-01-06") }
                 jsonPath("$.edition") { value(3) }
-                jsonPath("$.type") { value("hardcover") }
+                jsonPath("$.type") { value("HARDCOVER") }
             }
 
         verify(bookService).getBookByIsbn("9780134685991")
@@ -118,7 +120,7 @@ class BookControllerTest(
                 jsonPath("$.language") { value("English") }
                 jsonPath("$.publicationDate") { value("2018-01-06") }
                 jsonPath("$.edition") { value(3) }
-                jsonPath("$.type") { value("hardcover") }
+                jsonPath("$.type") { value("HARDCOVER") }
             }
 
         verify(bookService).addBook(request)
@@ -153,13 +155,62 @@ class BookControllerTest(
                       "genres": [],
                       "language": "",
                       "summary": "",
-                      "publicationDate": "not-a-date",
+                      "publicationDate": "2018-01-06",
                       "edition": 0,
-                      "type": "hardcover"
+                      "type": "HARDCOVER"
                     }
                     """.trimIndent()
             }.andExpect {
                 status { isBadRequest() }
+                jsonPath("$.status") { value(400) }
+                jsonPath("$.error") { value("Bad Request") }
+                jsonPath("$.message") { value("Request validation failed") }
+                jsonPath("$.details[*].field") { value(hasItem("isbn")) }
+                jsonPath("$.details[*].field") { value(hasItem("title")) }
+                jsonPath("$.details[*].field") { value(hasItem("pages")) }
+                jsonPath("$.details[*].field") { value(hasItem("publisher.address.zipCode")) }
+            }
+
+        verify(bookService, never()).addBook(any())
+    }
+
+    @Test
+    fun `addBook reports unreadable request body`() {
+        mockMvc
+            .post("/books") {
+                contentType = MediaType.APPLICATION_JSON
+                accept = MediaType.APPLICATION_JSON
+                content = testBookJson(publicationDate = "not-a-date")
+            }.andExpect {
+                status { isBadRequest() }
+                jsonPath("$.status") { value(400) }
+                jsonPath("$.error") { value("Bad Request") }
+                jsonPath("$.message") { value("Request body could not be parsed") }
+                jsonPath("$.details[0].field") { value("publicationDate") }
+                jsonPath("$.details[0].message") { value("Invalid date 'not-a-date'. Expected format yyyy-MM-dd") }
+            }
+
+        verify(bookService, never()).addBook(any())
+    }
+
+    @Test
+    fun `addBook reports malformed json request body`() {
+        mockMvc
+            .post("/books") {
+                contentType = MediaType.APPLICATION_JSON
+                accept = MediaType.APPLICATION_JSON
+                content =
+                    """
+                    {
+                      "isbn": 979-90-017-4210-1
+                    }
+                    """.trimIndent()
+            }.andExpect {
+                status { isBadRequest() }
+                jsonPath("$.status") { value(400) }
+                jsonPath("$.error") { value("Bad Request") }
+                jsonPath("$.message") { value("Request body could not be parsed") }
+                jsonPath("$.details[0].message") { value(startsWith("Malformed JSON:")) }
             }
 
         verify(bookService, never()).addBook(any())
@@ -177,6 +228,8 @@ class BookControllerTest(
                 content = testBookJson()
             }.andExpect {
                 status { isConflict() }
+                jsonPath("$.status") { value(409) }
+                jsonPath("$.error") { value("Conflict") }
                 jsonPath("$.message") { value("Book with ISBN already exists") }
             }
 
@@ -206,7 +259,7 @@ class BookControllerTest(
                 jsonPath("$.language") { value("English") }
                 jsonPath("$.publicationDate") { value("2018-01-06") }
                 jsonPath("$.edition") { value(3) }
-                jsonPath("$.type") { value("hardcover") }
+                jsonPath("$.type") { value("HARDCOVER") }
             }
 
         verify(bookService).updateBook(bookUuid, request)
@@ -221,6 +274,10 @@ class BookControllerTest(
                 content = testBookJson()
             }.andExpect {
                 status { isBadRequest() }
+                jsonPath("$.status") { value(400) }
+                jsonPath("$.error") { value("Bad Request") }
+                jsonPath("$.message") { value("Request parameter validation failed") }
+                jsonPath("$.details[0].message") { value("Invalid value 'not-a-uuid'. Expected UUID") }
             }
 
         verify(bookService, never()).updateBook(any(), any())
@@ -248,6 +305,8 @@ class BookControllerTest(
                 accept = MediaType.APPLICATION_JSON
             }.andExpect {
                 status { isNotFound() }
+                jsonPath("$.status") { value(404) }
+                jsonPath("$.error") { value("Not Found") }
                 jsonPath("$.message") { value("Book with ISBN missing was not found") }
             }
 

@@ -1,7 +1,7 @@
 package com.example.bookinfo.service
 
 import com.example.bookinfo.mapper.BookMapper
-import com.example.bookinfo.repository.BookEntity
+import com.example.bookinfo.repository.BookDocument
 import com.example.bookinfo.repository.BookRepository
 import com.example.bookinfo.testBook
 import com.example.bookinfo.testBookEntity
@@ -84,13 +84,13 @@ class BookServiceTest {
         val savedEntity = testBookEntity(id = bookUuid)
         val response = testBook(id = bookUuid)
         whenever(bookMapper.toEntity(request)).thenReturn(mappedEntity)
-        whenever(bookRepository.save(any<BookEntity>())).thenReturn(savedEntity)
+        whenever(bookRepository.save(any<BookDocument>())).thenReturn(savedEntity)
         whenever(bookMapper.toApi(savedEntity)).thenReturn(response)
 
         val created = bookService.addBook(request)
 
         assertThat(created).isEqualTo(response)
-        val savedEntityCaptor = argumentCaptor<BookEntity>()
+        val savedEntityCaptor = argumentCaptor<BookDocument>()
         verify(bookMapper).toEntity(request)
         verify(bookRepository).save(savedEntityCaptor.capture())
         assertThat(savedEntityCaptor.firstValue.id).isNotNull().isNotEqualTo(clientSuppliedUuid)
