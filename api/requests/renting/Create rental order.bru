@@ -1,0 +1,73 @@
+meta {
+  name: Create rental order
+  type: http
+  seq: 12
+}
+
+post {
+  url: {{rentingBaseUrl}}/orders
+  body: json
+  auth: none
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "userId": "{{rentingUserId}}",
+    "contents": [
+      {
+        "isbn": "{{rentingIsbn}}",
+        "title": "Effective Go Services",
+        "author": {
+          "firstname": "Ada",
+          "middlename": "",
+          "lastname": "Lovelace",
+          "bio": "Computer pioneer and technical author."
+        },
+        "pages": 300,
+        "publisher": {
+          "name": "Engineering Press",
+          "address": {
+            "street": "Main Street 1",
+            "zipCode": "02116",
+            "city": "Boston"
+          }
+        },
+        "genres": ["Programming", "Software Engineering"],
+        "language": "English",
+        "summary": "A practical guide to building Go services.",
+        "publicationDate": "2026-01-01",
+        "edition": 1,
+        "type": "HARDCOVER"
+      }
+    ],
+    "state": "PLACED"
+  }
+}
+
+script:pre-request {
+  function randomDigits(length) {
+    return Array.from({ length }, () => Math.floor(Math.random() * 10)).join("");
+  }
+  
+  function isbn13CheckDigit(first12Digits) {
+    const sum = [...first12Digits].reduce((total, digit, index) => {
+      return total + Number(digit) * (index % 2 === 0 ? 1 : 3);
+    }, 0);
+  
+    return String((10 - (sum % 10)) % 10);
+  }
+  
+  const first12Digits = `9780${randomDigits(8)}`;
+  bru.setVar("rentingIsbn", `${first12Digits}${isbn13CheckDigit(first12Digits)}`);
+}
+
+script:post-response {
+  if (res.status === 201 && res.body && res.body.id) {
+    bru.setVar("orderUuid", res.body.id);
+  }
+}

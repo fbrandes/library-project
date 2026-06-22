@@ -1,0 +1,19 @@
+meta {
+  name: Delete rental order
+  type: http
+  seq: 15
+}
+
+delete {
+  url: {{rentingBaseUrl}}/orders/:uuid
+  body: none
+  auth: none
+}
+
+params:path {
+  uuid: {{orderUuid}}
+}
+
+headers {
+  Accept: application/json
+}

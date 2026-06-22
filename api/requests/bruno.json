@@ -1,6 +1,6 @@
 {
   "version": "1",
-  "name": "Bookinfo",
+  "name": "Library Services",
   "type": "collection",
   "ignore": [
     "node_modules",

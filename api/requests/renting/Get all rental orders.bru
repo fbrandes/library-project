@@ -1,0 +1,15 @@
+meta {
+  name: Get all rental orders
+  type: http
+  seq: 11
+}
+
+get {
+  url: {{rentingBaseUrl}}/orders
+  body: none
+  auth: none
+}
+
+headers {
+  Accept: application/json
+}
