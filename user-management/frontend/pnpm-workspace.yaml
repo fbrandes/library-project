@@ -1,0 +1,10 @@
+packages:
+  - .
+
+onlyBuiltDependencies:
+  - esbuild
+  - vue-material
+
+allowBuilds:
+  esbuild: true
+  vue-material: true

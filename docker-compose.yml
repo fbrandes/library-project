@@ -1,3 +1,4 @@
 include:
   - bookinfo/docker-compose.yml
   - renting/docker-compose.yml
+  - user-management/docker-compose.yml
