@@ -1,0 +1,6 @@
+# https://docs.sqlfluff.com/en/stable/configuration.html
+
+[sqlfluff]
+dialect = postgres
+
+max_line_length = 120
