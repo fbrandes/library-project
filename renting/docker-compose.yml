@@ -1,0 +1,43 @@
+services:
+  renting-ui:
+    build:
+      context: frontend
+    ports:
+      - "5174:80"
+    depends_on:
+      - renting
+
+  renting:
+    build:
+      context: ..
+      dockerfile: renting/backend/Dockerfile
+    environment:
+      RENTING_ADDR: ":8090"
+      RENTING_DATABASE_DRIVER: pgx
+      RENTING_DATABASE_URL: postgres://renting:renting@renting-postgres:5432/renting?sslmode=disable
+      RENTING_AUTO_MIGRATE: "true"
+    ports:
+      - "8090:8090"
+    depends_on:
+      renting-postgres:
+        condition: service_healthy
+
+  renting-postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: renting
+      POSTGRES_USER: renting
+      POSTGRES_PASSWORD: renting
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - renting-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  renting-postgres-data:
