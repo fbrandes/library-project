@@ -13,10 +13,10 @@ services:
       context: ..
       dockerfile: user-management/backend/Dockerfile
     environment:
-      USER_MANAGEMENT_PORT: "8091"
+      USER_MANAGEMENT_PORT: "8080"
       USER_MANAGEMENT_DATABASE_URL: postgres://user_management:user_management@user-management-postgres:5432/user_management
     ports:
-      - "8091:8091"
+      - "8083:8080"
     depends_on:
       user-management-postgres:
         condition: service_healthy

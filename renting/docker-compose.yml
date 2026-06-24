@@ -12,12 +12,12 @@ services:
       context: ..
       dockerfile: renting/backend/Dockerfile
     environment:
-      RENTING_ADDR: ":8090"
+      RENTING_ADDR: ":8080"
       RENTING_DATABASE_DRIVER: pgx
       RENTING_DATABASE_URL: postgres://renting:renting@renting-postgres:5432/renting?sslmode=disable
       RENTING_AUTO_MIGRATE: "true"
     ports:
-      - "8090:8090"
+      - "8082:8080"
     depends_on:
       renting-postgres:
         condition: service_healthy

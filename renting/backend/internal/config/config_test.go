@@ -9,7 +9,7 @@ func TestLoadUsesDefaults(t *testing.T) {
 	t.Setenv("RENTING_AUTO_MIGRATE", "")
 
 	cfg := Load()
-	if cfg.Addr != ":8090" {
+	if cfg.Addr != ":8080" {
 		t.Fatalf("expected default addr, got %q", cfg.Addr)
 	}
 	if cfg.DatabaseDriver != "pgx" {

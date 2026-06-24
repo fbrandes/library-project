@@ -23,6 +23,6 @@ COPY --from=build --chown=renting:renting /out/renting /app/renting
 
 USER renting
 
-EXPOSE 8090
+EXPOSE 8080
 
 ENTRYPOINT ["/app/renting"]

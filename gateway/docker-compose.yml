@@ -1,0 +1,42 @@
+services:
+  gateway:
+    build:
+      context: ..
+      dockerfile: gateway/Dockerfile
+    environment:
+      GATEWAY_OAUTH2_ISSUER_URI: http://keycloak:8080/realms/library
+      BOOKINFO_API_URI: http://bookinfo:8080
+      RENTING_API_URI: http://renting:8080
+      USER_MANAGEMENT_API_URI: http://user-management:8080
+      BOOKINFO_UI_URI: http://bookinfo-ui:80
+      RENTING_UI_URI: http://renting-ui:80
+      USER_MANAGEMENT_UI_URI: http://user-management-ui:80
+    ports:
+      - "8080:8080"
+    depends_on:
+      keycloak:
+        condition: service_started
+
+  oauth2-proxy:
+    image: quay.io/oauth2-proxy/oauth2-proxy:v7.8.1
+    command: ["--config=/etc/oauth2-proxy/oauth2-proxy.cfg"]
+    volumes:
+      - ./oauth2-proxy/oauth2-proxy.cfg:/etc/oauth2-proxy/oauth2-proxy.cfg:ro
+    ports:
+      - "4180:4180"
+    depends_on:
+      gateway:
+        condition: service_started
+      keycloak:
+        condition: service_started
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0
+    command: ["start-dev", "--import-realm"]
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+    ports:
+      - "8090:8080"
+    volumes:
+      - ./keycloak/library-realm.json:/opt/keycloak/data/import/library-realm.json:ro

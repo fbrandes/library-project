@@ -26,6 +26,6 @@ RUN corepack enable \
 
 COPY --from=build /workspace/user-management/backend/dist dist
 
-EXPOSE 8091
+EXPOSE 8080
 
 CMD ["node", "dist/main.js"]

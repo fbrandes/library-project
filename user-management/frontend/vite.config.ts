@@ -2,12 +2,13 @@ import vue from '@vitejs/plugin-vue2';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
+  base: '/user-management/',
   plugins: [vue()],
   server: {
     port: 5175,
     proxy: {
       '/api': {
-        target: 'http://localhost:8091',
+        target: 'http://localhost:8083',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
       },

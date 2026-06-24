@@ -1,0 +1,60 @@
+{
+  "realm": "library",
+  "enabled": true,
+  "roles": {
+    "realm": [
+      {
+        "name": "USER"
+      },
+      {
+        "name": "ADMIN"
+      },
+      {
+        "name": "LIBRARIAN"
+      }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "gateway-resource-server",
+      "enabled": true,
+      "publicClient": true,
+      "protocol": "openid-connect",
+      "bearerOnly": true
+    },
+    {
+      "clientId": "oauth2-proxy",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "secret": "local-oauth2-proxy-secret",
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "redirectUris": [
+        "http://localhost:4180/oauth2/callback"
+      ],
+      "webOrigins": [
+        "http://localhost:4180"
+      ]
+    }
+  ],
+  "users": [
+    {
+      "username": "local-user",
+      "enabled": true,
+      "email": "local-user@example.test",
+      "firstName": "Local",
+      "lastName": "User",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "local-password",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "USER"
+      ]
+    }
+  ]
+}

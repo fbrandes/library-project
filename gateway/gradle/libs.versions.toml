@@ -1,0 +1,35 @@
+[versions]
+spring-boot = "4.1.0"
+spring-dependency-management = "1.1.7"
+kotlin = "2.4.0"
+openapi-generator = "7.14.0"
+ktlint-gradle = "14.2.0"
+mapstruct = "1.6.3"
+mockito-kotlin = "6.3.0"
+testcontainers = "1.21.4"
+
+[libraries]
+springBootStarterActuator = { module = "org.springframework.boot:spring-boot-starter-actuator" }
+springBootStarterDataMongodb = { module = "org.springframework.boot:spring-boot-starter-data-mongodb" }
+springBootStarterValidation = { module = "org.springframework.boot:spring-boot-starter-validation" }
+springBootStarterWebmvc = { module = "org.springframework.boot:spring-boot-starter-webmvc" }
+springBootStarterTest = { module = "org.springframework.boot:spring-boot-starter-test" }
+springBootStarterWebmvcTest = { module = "org.springframework.boot:spring-boot-starter-webmvc-test" }
+jacksonModuleKotlin = { module = "tools.jackson.module:jackson-module-kotlin" }
+jacksonAnnotations = { module = "com.fasterxml.jackson.core:jackson-annotations" }
+kotlinReflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
+mapstruct = { module = "org.mapstruct:mapstruct", version.ref = "mapstruct" }
+mapstructProcessor = { module = "org.mapstruct:mapstruct-processor", version.ref = "mapstruct" }
+mockitoKotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockito-kotlin" }
+testcontainersJunitJupiter = { module = "org.testcontainers:junit-jupiter", version.ref = "testcontainers" }
+testcontainersMongodb = { module = "org.testcontainers:mongodb", version.ref = "testcontainers" }
+junitPlatformLauncher = { module = "org.junit.platform:junit-platform-launcher" }
+
+[plugins]
+springBoot = { id = "org.springframework.boot", version.ref = "spring-boot" }
+springDependencyManagement = { id = "io.spring.dependency-management", version.ref = "spring-dependency-management" }
+kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlinSpring = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotlin" }
+kotlinKapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
+openapiGenerator = { id = "org.openapi.generator", version.ref = "openapi-generator" }
+ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint-gradle" }

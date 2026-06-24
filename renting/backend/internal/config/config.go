@@ -14,7 +14,7 @@ type Config struct {
 
 func Load() Config {
 	return Config{
-		Addr:           getenv("RENTING_ADDR", ":8090"),
+		Addr:           getenv("RENTING_ADDR", ":8080"),
 		DatabaseURL:    os.Getenv("RENTING_DATABASE_URL"),
 		DatabaseDriver: getenv("RENTING_DATABASE_DRIVER", "pgx"),
 		AutoMigrate:    getenvBool("RENTING_AUTO_MIGRATE", true),
