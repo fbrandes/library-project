@@ -1,0 +1,7 @@
+version: "3"
+
+tasks:
+    lint:
+        desc: Lints the whole project
+        dir: .
+        cmd: docker ...

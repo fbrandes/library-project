@@ -1,0 +1,11 @@
+version: "3"
+
+tasks:
+    build-gateway-image:
+        desc: "Builds the Application Gateway Docker image"
+        dir: .
+        vars:
+            APP_VERSION:
+                sh: ./gradlew properties -q | awk '/^version:/ {print $2}'
+            IMAGE_VERSION: "{{.APP_VERSION| default latest }}"
+        cmd: docker build -t fbrandes-library/gateway:${APP_VERSION} .
