@@ -1,26 +1,35 @@
 [versions]
 spring-boot = "4.1.0"
 spring-dependency-management = "1.1.7"
+spring-cloud = "2025.1.2"
 kotlin = "2.4.0"
 openapi-generator = "7.14.0"
 ktlint-gradle = "14.2.0"
 mapstruct = "1.6.3"
+mockwebserver = "4.12.0"
 mockito-kotlin = "6.3.0"
 testcontainers = "1.21.4"
 
 [libraries]
 springBootStarterActuator = { module = "org.springframework.boot:spring-boot-starter-actuator" }
 springBootStarterDataMongodb = { module = "org.springframework.boot:spring-boot-starter-data-mongodb" }
+springBootStarterOauth2ResourceServer = { module = "org.springframework.boot:spring-boot-starter-oauth2-resource-server" }
+springBootStarterSecurity = { module = "org.springframework.boot:spring-boot-starter-security" }
 springBootStarterValidation = { module = "org.springframework.boot:spring-boot-starter-validation" }
 springBootStarterWebmvc = { module = "org.springframework.boot:spring-boot-starter-webmvc" }
 springBootStarterTest = { module = "org.springframework.boot:spring-boot-starter-test" }
+springBootStarterWebfluxTest = { module = "org.springframework.boot:spring-boot-starter-webflux-test" }
 springBootStarterWebmvcTest = { module = "org.springframework.boot:spring-boot-starter-webmvc-test" }
+springCloudStarterGatewayServerWebflux = { module = "org.springframework.cloud:spring-cloud-starter-gateway-server-webflux" }
 jacksonModuleKotlin = { module = "tools.jackson.module:jackson-module-kotlin" }
 jacksonAnnotations = { module = "com.fasterxml.jackson.core:jackson-annotations" }
 kotlinReflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 mapstruct = { module = "org.mapstruct:mapstruct", version.ref = "mapstruct" }
 mapstructProcessor = { module = "org.mapstruct:mapstruct-processor", version.ref = "mapstruct" }
+mockWebServer = { module = "com.squareup.okhttp3:mockwebserver", version.ref = "mockwebserver" }
 mockitoKotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockito-kotlin" }
+reactorTest = { module = "io.projectreactor:reactor-test" }
+springSecurityTest = { module = "org.springframework.security:spring-security-test" }
 testcontainersJunitJupiter = { module = "org.testcontainers:junit-jupiter", version.ref = "testcontainers" }
 testcontainersMongodb = { module = "org.testcontainers:mongodb", version.ref = "testcontainers" }
 junitPlatformLauncher = { module = "org.junit.platform:junit-platform-launcher" }

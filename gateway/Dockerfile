@@ -1,4 +1,4 @@
-FROM eclipse-temurin:21-jdk AS build
+FROM eclipse-temurin:25-jdk AS build
 
 WORKDIR /workspace
 
@@ -9,7 +9,7 @@ COPY gateway/src ./gateway/src
 WORKDIR /workspace/gateway
 RUN ./gradlew --no-daemon bootJar
 
-FROM eclipse-temurin:21-jre
+FROM eclipse-temurin:25-jre
 
 WORKDIR /app
 

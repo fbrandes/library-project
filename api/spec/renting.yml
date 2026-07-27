@@ -4,7 +4,7 @@ info:
   version: 1.0.0
   description: REST API for renting books and managing rental orders.
 servers:
-  - url: http://localhost:8090
+  - url: http://localhost:8082
 paths:
   /health:
     get:
