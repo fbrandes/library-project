@@ -1,0 +1,63 @@
+version: 2
+updates:
+  - package-ecosystem: "docker"
+    directories:
+      - bookinfo/
+      - gateway/
+      - renting/
+      - user-management/
+    schedule:
+      interval: "daily"
+    groups:
+      dev-dependencies:
+        patterns:
+          - "*"
+    cooldown:
+      default-days: 14
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    groups:
+      dev-dependencies:
+        patterns:
+          - "*"
+    cooldown:
+      default-days: 14
+  - package-ecosystem: "gomod"
+    directories:
+      - renting/backend
+    schedule:
+      interval: "daily"
+    groups:
+      dev-dependencies:
+        patterns:
+          - "*"
+    cooldown:
+      default-days: 14
+  - package-ecosystem: "gradle"
+    directories:
+      - bookinfo/backend
+      - gateway/
+    schedule:
+      interval: "daily"
+    groups:
+      dev-dependencies:
+        patterns:
+          - "*"
+    cooldown:
+      default-days: 14
+  - package-ecosystem: "npm"
+    directories:
+      - bookinfo/frontend
+      - renting/frontend
+      - user-management/frontend
+      - user-management/backend
+    schedule:
+      interval: "daily"
+    groups:
+      dev-dependencies:
+        patterns:
+          - "*"
+    cooldown:
+      default-days: 14

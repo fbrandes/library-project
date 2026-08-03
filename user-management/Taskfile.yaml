@@ -3,6 +3,7 @@ version: "3"
 tasks:
     build-backend-image:
         desc: "Builds the User Management backend Docker image"
+        deps: [ setup-node ]
         dir: ./backend
         vars:
             APP_VERSION:
@@ -11,6 +12,7 @@ tasks:
         cmd: docker build -t fbrandes-library/user-management-frontend:${APP_VERSION} .
     build-frontend-image:
         desc: "Builds the User Management frontend Docker image"
+        deps: [ setup-node ]
         dir: ./frontend
         vars:
             APP_VERSION:

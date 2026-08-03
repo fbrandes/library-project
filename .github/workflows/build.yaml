@@ -1,0 +1,40 @@
+name: Build changed services
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      has_changes: ${{ steps.detect.outputs.has_changes }}
+      matrix: ${{ steps.detect.outputs.matrix }}
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - id: detect
+        shell: bash
+        run: |
+          result="$(task detect-changed-services)"
+          echo "has_changes=$(printf '%s' "$result" | jq -r '.has_changes')" >> "$GITHUB_OUTPUT"
+          echo "matrix=$(printf '%s' "$result" | jq -c '.matrix')" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: detect-changes
+    if: needs.detect.outputs.has_changes == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.detect.outputs.matrix) }}
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - run: task app:${{ matrix.service }}:build

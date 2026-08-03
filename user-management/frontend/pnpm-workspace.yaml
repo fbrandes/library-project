@@ -7,4 +7,5 @@ onlyBuiltDependencies:
 
 allowBuilds:
   esbuild: true
+  unrs-resolver: true
   vue-material: true
