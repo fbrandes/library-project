@@ -1,8 +1,11 @@
-import { cleanup } from '@testing-library/react';
-import '@testing-library/jest-dom/vitest';
-import { afterEach, beforeEach, vi } from 'vitest';
+import { cleanup } from "@testing-library/react";
+import "@testing-library/jest-dom/vitest";
+import { afterEach, beforeEach, vi } from "vitest";
 
-function createMatchMediaResult(query: string, matches = false): MediaQueryList {
+function createMatchMediaResult(
+  query: string,
+  matches = false,
+): MediaQueryList {
   return {
     addEventListener: vi.fn(),
     addListener: vi.fn(),
@@ -16,7 +19,7 @@ function createMatchMediaResult(query: string, matches = false): MediaQueryList 
 }
 
 beforeEach(() => {
-  Object.defineProperty(window, 'matchMedia', {
+  Object.defineProperty(window, "matchMedia", {
     configurable: true,
     value: vi.fn((query: string) => createMatchMediaResult(query)),
     writable: true,

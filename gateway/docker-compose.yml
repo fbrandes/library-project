@@ -8,12 +8,12 @@ services:
       BOOKINFO_API_URI: http://bookinfo:8080
       RENTING_API_URI: http://renting:8080
       USER_MANAGEMENT_API_URI: http://user-management:8080
-      BOOKINFO_UI_URI: http://bookinfo-ui:80
-      RENTING_UI_URI: http://renting-ui:80
-      USER_MANAGEMENT_UI_URI: http://user-management-ui:80
+      FRONTEND_UI_URI: http://frontend-ui:80
     ports:
       - "8080:8080"
     depends_on:
+      frontend-ui:
+        condition: service_started
       keycloak:
         condition: service_started
 

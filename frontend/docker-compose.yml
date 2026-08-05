@@ -1,0 +1,11 @@
+services:
+  frontend-ui:
+    build:
+      context: ..
+      dockerfile: frontend/Dockerfile
+    ports:
+      - "5173:80"
+    depends_on:
+      - bookinfo
+      - renting
+      - user-management

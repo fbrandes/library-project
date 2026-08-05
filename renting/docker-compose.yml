@@ -1,12 +1,4 @@
 services:
-  renting-ui:
-    build:
-      context: frontend
-    ports:
-      - "5174:80"
-    depends_on:
-      - renting
-
   renting:
     build:
       context: ..
@@ -33,7 +25,8 @@ services:
     volumes:
       - renting-postgres-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      test:
+        ["CMD-SHELL", 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
       interval: 10s
       timeout: 5s
       retries: 5

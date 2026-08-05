@@ -9,15 +9,15 @@ tasks:
 
   build-gateway:
     desc: "Builds the Book Info gateway"
-    deps: [ setup-gradle ]
+    deps: [setup-gradle]
     cmd: ./gradlew build -x test
 
   build-gateway-image:
-      desc: "Builds the Application Gateway Docker image"
-      deps: [ setup-gradle ]
-      dir: .
-      vars:
-          APP_VERSION:
-              sh: ./gradlew properties -q | awk '/^version:/ {print $2}'
-          IMAGE_VERSION: "{{.APP_VERSION| default latest }}"
-      cmd: docker build -t fbrandes-library/gateway:${APP_VERSION} .
+    desc: "Builds the Application Gateway Docker image"
+    deps: [setup-gradle]
+    dir: .
+    vars:
+      APP_VERSION:
+        sh: ./gradlew properties -q | awk '/^version:/ {print $2}'
+      IMAGE_VERSION: "{{.APP_VERSION| default latest }}"
+    cmd: docker build -t fbrandes-library/gateway:${APP_VERSION} .

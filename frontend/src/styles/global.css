@@ -1,0 +1,149 @@
+@import '../../../renting/frontend/src/styles.css';
+@import '../../../user-management/frontend/src/styles.css';
+
+:root {
+  color: #18212a;
+  background: #eef2f0;
+  font-family:
+    ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background:
+    linear-gradient(90deg, rgba(19, 78, 74, 0.08) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(130, 88, 46, 0.08) 1px, transparent 1px),
+    #eef2f0;
+  background-size: 28px 28px;
+  color: #18212a;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+.library-shell {
+  min-height: 100vh;
+}
+
+.library-header {
+  align-items: center;
+  background: rgba(250, 252, 250, 0.94);
+  border-bottom: 1px solid #d6ded8;
+  display: flex;
+  gap: 24px;
+  justify-content: space-between;
+  padding: 18px clamp(18px, 4vw, 48px);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.library-kicker,
+.library-domain-heading p {
+  color: #59665f;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  margin: 0 0 4px;
+  text-transform: uppercase;
+}
+
+.library-header h1,
+.library-domain-heading h2 {
+  letter-spacing: 0;
+  margin: 0;
+}
+
+.library-header h1 {
+  font-size: clamp(1.45rem, 3vw, 2.25rem);
+  line-height: 1.05;
+}
+
+.library-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.library-nav a {
+  align-items: center;
+  border: 1px solid #cbd6cf;
+  border-radius: 999px;
+  color: #26352d;
+  display: inline-flex;
+  font-size: 0.92rem;
+  font-weight: 750;
+  min-height: 38px;
+  padding: 8px 14px;
+  text-decoration: none;
+}
+
+.library-nav a:focus-visible {
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.2);
+  outline: none;
+}
+
+.library-main {
+  display: grid;
+  gap: 24px;
+  margin: 0 auto;
+  max-width: 1280px;
+  padding: 24px clamp(14px, 4vw, 40px) 40px;
+}
+
+.library-domain {
+  background: #ffffff;
+  border: 1px solid #d8e0db;
+  border-radius: 8px;
+  box-shadow: 0 16px 44px rgba(32, 47, 38, 0.08);
+  display: grid;
+  gap: 18px;
+  padding: clamp(16px, 3vw, 24px);
+}
+
+.library-domain-bookinfo {
+  border-top: 5px solid #1565c0;
+}
+
+.library-domain-renting {
+  border-top: 5px solid #24543d;
+}
+
+.library-domain-users {
+  border-top: 5px solid #0f766e;
+}
+
+.library-domain-heading h2 {
+  color: #1f2a33;
+  font-size: 1.2rem;
+}
+
+@media (max-width: 760px) {
+  .library-header {
+    align-items: stretch;
+    display: grid;
+    position: static;
+  }
+
+  .library-nav {
+    justify-content: start;
+  }
+
+  .library-nav a {
+    flex: 1 1 92px;
+    justify-content: center;
+  }
+}

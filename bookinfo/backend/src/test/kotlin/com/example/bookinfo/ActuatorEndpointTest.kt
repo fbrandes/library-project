@@ -9,22 +9,22 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 
 @MongoDbIntegrationTest(
-    properties = [
-        "management.health.mongodb.enabled=false",
-    ],
+  properties = [
+    "management.health.mongodb.enabled=false",
+  ],
 )
 @DisplayName("Actuator Endpoints")
 @AutoConfigureMockMvc
 class ActuatorEndpointTest(
-    @Autowired private val mockMvc: MockMvc,
+  @Autowired private val mockMvc: MockMvc,
 ) {
-    @ParameterizedTest(name = "{0} endpoint is up")
-    @ValueSource(strings = ["/health", "/info"])
-    fun actuatorEndpointAreAvailable(endpoint: String) {
-        mockMvc
-            .get(endpoint) {}
-            .andExpect {
-                status { isOk() }
-            }
-    }
+  @ParameterizedTest(name = "{0} endpoint is up")
+  @ValueSource(strings = ["/health", "/info"])
+  fun actuatorEndpointAreAvailable(endpoint: String) {
+    mockMvc
+      .get(endpoint) {}
+      .andExpect {
+        status { isOk() }
+      }
+  }
 }

@@ -1,13 +1,16 @@
 # Repository Guidelines
 
 ## Project Overview
+
 This repository contains the user management microservice. It is divided into two primary modules:
 
 ## Project Structure
+
 - `backend/`: NodeJS + Postgres
 - `frontend/`: Vue w/ with Vite
 
 ## Build, Test and Development Commands
+
 - `cd backend && npm run start`: starts Vite dev server.
 - `cd backend && npm run build`: API model build + TypeScript compile + production build.
 - `cd backend && npm test`: runs Vitest unit tests once.
@@ -20,7 +23,9 @@ This repository contains the user management microservice. It is divided into tw
 - `cd frontend && npm run test:coverage`: runs tests with coverage.
 
 ## Technical Stack
+
 ### Backend
+
 - Language: Go
 - Build Tool: Makefile
 - Database: Postgres
@@ -28,6 +33,7 @@ This repository contains the user management microservice. It is divided into tw
 - Testing: go testing, Testcontainers
 
 ### Frontend
+
 - Framework: Svelte
 - Build Tool: Vite
 - Language: TypeScript
@@ -36,11 +42,13 @@ This repository contains the user management microservice. It is divided into tw
 ## Setup commands
 
 ## Coding Guidelines
+
 When assisting with code generation or modifications, adhere to the following rules:
 
 ### Backend Development Rules
+
 - TBD
 
 ## Workflow
-- Ensure code adheres to the conventional commits specification, as enforced by `commitlint` and `commitguard`.
 
+- Ensure code adheres to the conventional commits specification, as enforced by `commitlint` and `commitguard`.

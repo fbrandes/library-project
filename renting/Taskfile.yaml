@@ -1,21 +1,21 @@
 version: "3"
 
 tasks:
-    build-backend-image:
-        desc: "Builds the Book Renting backend Docker image"
-        deps: [ setup-go ]
-        dir: ./backend
-        vars:
-            APP_VERSION:
-                sh: cat .go-version
-            IMAGE_VERSION: "{{.APP_VERSION| default latest }}"
-        cmd: docker build -t fbrandes-library/renting-backend:${APP_VERSION} .
-    build-frontend-image:
-        desc: "Builds the Book Renting frontend Docker image"
-        deps: [ setup-node ]
-        dir: ./frontend
-        vars:
-            APP_VERSION:
-                sh: cat package.json | jq -r '.version'
-            IMAGE_VERSION: "{{.APP_VERSION| default latest }}"
-        cmd: docker build -t fbrandes-library/renting-frontend:${APP_VERSION} .
+  build-backend-image:
+    desc: "Builds the Book Renting backend Docker image"
+    deps: [setup-go]
+    dir: ./backend
+    vars:
+      APP_VERSION:
+        sh: cat .go-version
+      IMAGE_VERSION: "{{.APP_VERSION| default latest }}"
+    cmd: docker build -t fbrandes-library/renting-backend:${APP_VERSION} .
+  build-frontend-image:
+    desc: "Builds the Book Renting frontend Docker image"
+    deps: [setup-node]
+    dir: ./frontend
+    vars:
+      APP_VERSION:
+        sh: cat package.json | jq -r '.version'
+      IMAGE_VERSION: "{{.APP_VERSION| default latest }}"
+    cmd: docker build -t fbrandes-library/renting-frontend:${APP_VERSION} .

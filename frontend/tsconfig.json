@@ -1,0 +1,17 @@
+{
+  "extends": "astro/tsconfigs/strict",
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "jsx": "react-jsx",
+    "strict": true
+  },
+  "include": [
+    ".astro/types.d.ts",
+    "**/*",
+    "../bookinfo/frontend/src/**/*",
+    "../renting/frontend/src/**/*",
+    "../user-management/frontend/src/**/*"
+  ],
+  "exclude": ["dist"]
+}

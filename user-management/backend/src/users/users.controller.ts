@@ -1,8 +1,22 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put } from '@nestjs/common';
-import type { CreateUserRequest, UpdateUserRequest, User } from '../generated/userModels.js';
-import { UsersService } from './users.service.js';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+  Put,
+} from "@nestjs/common";
+import type {
+  CreateUserRequest,
+  UpdateUserRequest,
+  User,
+} from "../generated/userModels.js";
+import { UsersService } from "./users.service.js";
 
-@Controller('users')
+@Controller("users")
 export class UsersController {
   constructor(private readonly users: UsersService) {}
 
@@ -12,19 +26,22 @@ export class UsersController {
     return this.users.create(input);
   }
 
-  @Get(':id')
-  getById(@Param('id') id: string): Promise<User> {
+  @Get(":id")
+  getById(@Param("id") id: string): Promise<User> {
     return this.users.getById(id);
   }
 
-  @Put(':id')
-  update(@Param('id') id: string, @Body() input: UpdateUserRequest): Promise<User> {
+  @Put(":id")
+  update(
+    @Param("id") id: string,
+    @Body() input: UpdateUserRequest,
+  ): Promise<User> {
     return this.users.update(id, input);
   }
 
-  @Delete(':id')
+  @Delete(":id")
   @HttpCode(HttpStatus.NO_CONTENT)
-  delete(@Param('id') id: string): Promise<void> {
+  delete(@Param("id") id: string): Promise<void> {
     return this.users.delete(id);
   }
 }

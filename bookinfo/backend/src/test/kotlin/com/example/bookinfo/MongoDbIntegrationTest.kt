@@ -17,24 +17,24 @@ import kotlin.reflect.KClass
 @ContextConfiguration(initializers = [MongoContainerInitializer::class])
 @Testcontainers(disabledWithoutDocker = true)
 annotation class MongoDbIntegrationTest(
-    @get:AliasFor(annotation = SpringBootTest::class, attribute = "properties")
-    val properties: Array<String> = [],
-    @get:AliasFor(annotation = SpringBootTest::class, attribute = "classes")
-    val classes: Array<KClass<*>> = [],
-    @get:AliasFor(annotation = SpringBootTest::class, attribute = "webEnvironment")
-    val webEnvironment: SpringBootTest.WebEnvironment = SpringBootTest.WebEnvironment.MOCK,
+  @get:AliasFor(annotation = SpringBootTest::class, attribute = "properties")
+  val properties: Array<String> = [],
+  @get:AliasFor(annotation = SpringBootTest::class, attribute = "classes")
+  val classes: Array<KClass<*>> = [],
+  @get:AliasFor(annotation = SpringBootTest::class, attribute = "webEnvironment")
+  val webEnvironment: SpringBootTest.WebEnvironment = SpringBootTest.WebEnvironment.MOCK,
 )
 
 class MongoContainerInitializer : ApplicationContextInitializer<ConfigurableApplicationContext> {
-    private val mongodb = MongoDBContainer(DockerImageName.parse("mongo:8.2"))
+  private val mongodb = MongoDBContainer(DockerImageName.parse("mongo:8.2"))
 
-    override fun initialize(applicationContext: ConfigurableApplicationContext) {
-        mongodb.start()
+  override fun initialize(applicationContext: ConfigurableApplicationContext) {
+    mongodb.start()
 
-        TestPropertyValues
-            .of(
-                "spring.mongodb.uri=${mongodb.replicaSetUrl}",
-                "spring.mongodb.database=bookinfo",
-            ).applyTo(applicationContext.environment)
-    }
+    TestPropertyValues
+      .of(
+        "spring.mongodb.uri=${mongodb.replicaSetUrl}",
+        "spring.mongodb.database=bookinfo",
+      ).applyTo(applicationContext.environment)
+  }
 }

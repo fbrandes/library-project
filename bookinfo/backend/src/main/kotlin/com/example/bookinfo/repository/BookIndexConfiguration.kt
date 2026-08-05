@@ -10,11 +10,11 @@ import org.springframework.data.mongodb.core.indexOps
 
 @Configuration
 class BookIndexConfiguration {
-    @Bean
-    fun bookIndexInitializer(mongoTemplate: MongoTemplate) =
-        ApplicationRunner {
-            mongoTemplate
-                .indexOps<BookDocument>()
-                .createIndex(Index().on(BookDocument::isbn.name, Sort.Direction.ASC).unique())
-        }
+  @Bean
+  fun bookIndexInitializer(mongoTemplate: MongoTemplate) =
+    ApplicationRunner {
+      mongoTemplate
+        .indexOps<BookDocument>()
+        .createIndex(Index().on(BookDocument::isbn.name, Sort.Direction.ASC).unique())
+    }
 }

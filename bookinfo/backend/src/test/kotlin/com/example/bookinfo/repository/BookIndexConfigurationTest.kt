@@ -16,20 +16,20 @@ import org.springframework.data.mongodb.core.indexOps
 
 @ExtendWith(MockitoExtension::class)
 class BookIndexConfigurationTest {
-    @Mock(answer = Answers.RETURNS_MOCKS)
-    private lateinit var mongoTemplate: MongoTemplate
+  @Mock(answer = Answers.RETURNS_MOCKS)
+  private lateinit var mongoTemplate: MongoTemplate
 
-    @Mock
-    private lateinit var indexOperations: IndexOperations
+  @Mock
+  private lateinit var indexOperations: IndexOperations
 
-    @Test
-    fun `bookIndexInitializer ensures isbn index`() {
-        whenever(mongoTemplate.indexOps<BookDocument>()).thenReturn(indexOperations)
+  @Test
+  fun `bookIndexInitializer ensures isbn index`() {
+    whenever(mongoTemplate.indexOps<BookDocument>()).thenReturn(indexOperations)
 
-        BookIndexConfiguration()
-            .bookIndexInitializer(mongoTemplate)
-            .run(DefaultApplicationArguments())
+    BookIndexConfiguration()
+      .bookIndexInitializer(mongoTemplate)
+      .run(DefaultApplicationArguments())
 
-        verify(indexOperations).createIndex(any<Index>())
-    }
+    verify(indexOperations).createIndex(any<Index>())
+  }
 }

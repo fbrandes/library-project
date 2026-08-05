@@ -1,6 +1,8 @@
-import type { Book } from '../types/book';
+import type { Book } from "../types/book";
 
-const API_BASE_URL = (import.meta.env.VITE_BOOKINFO_API_BASE_URL ?? '/api').replace(/\/$/, '');
+const API_BASE_URL = (
+  import.meta.env.VITE_BOOKINFO_API_BASE_URL ?? "/api"
+).replace(/\/$/, "");
 
 export interface BookApi {
   getBooks: () => Promise<Book[]>;
@@ -13,7 +15,7 @@ export class ApiError extends Error {
     message: string,
   ) {
     super(message);
-    this.name = 'ApiError';
+    this.name = "ApiError";
   }
 }
 
@@ -28,7 +30,7 @@ function getErrorMessage(response: Response): string {
 async function fetchJson<T>(path: string): Promise<T> {
   const response = await fetch(buildUrl(path), {
     headers: {
-      Accept: 'application/json',
+      Accept: "application/json",
     },
   });
 
@@ -40,13 +42,13 @@ async function fetchJson<T>(path: string): Promise<T> {
 }
 
 export async function getBooks(): Promise<Book[]> {
-  return fetchJson<Book[]>('/books');
+  return fetchJson<Book[]>("/books");
 }
 
 export async function getBookByIsbn(isbn: string): Promise<Book | null> {
   const response = await fetch(buildUrl(`/books/${encodeURIComponent(isbn)}`), {
     headers: {
-      Accept: 'application/json',
+      Accept: "application/json",
     },
   });
 

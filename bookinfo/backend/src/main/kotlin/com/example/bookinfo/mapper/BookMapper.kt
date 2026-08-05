@@ -7,7 +7,7 @@ import org.mapstruct.MappingConstants
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 interface BookMapper {
-    fun toEntity(book: Book): BookDocument
+  fun toEntity(book: Book): BookDocument
 
-    fun toApi(entity: BookDocument): Book
+  fun toApi(entity: BookDocument): Book
 }

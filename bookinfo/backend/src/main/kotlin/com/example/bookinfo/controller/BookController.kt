@@ -18,32 +18,32 @@ import java.util.UUID
 @RestController
 @RequestMapping("/books")
 class BookController(
-    private val bookService: BookService,
+  private val bookService: BookService,
 ) {
-    @GetMapping
-    fun getBooks(): ResponseEntity<List<Book>> = ResponseEntity.ok(bookService.getBooks())
+  @GetMapping
+  fun getBooks(): ResponseEntity<List<Book>> = ResponseEntity.ok(bookService.getBooks())
 
-    @GetMapping("/{identifier}")
-    fun getBookByIsbn(
-        @PathVariable("identifier") isbn: String,
-    ): ResponseEntity<Book> = ResponseEntity.ok(bookService.getBookByIsbn(isbn))
+  @GetMapping("/{identifier}")
+  fun getBookByIsbn(
+    @PathVariable("identifier") isbn: String,
+  ): ResponseEntity<Book> = ResponseEntity.ok(bookService.getBookByIsbn(isbn))
 
-    @PostMapping
-    fun addBook(
-        @Valid @RequestBody book: Book,
-    ): ResponseEntity<Book> = ResponseEntity.status(HttpStatus.CREATED).body(bookService.addBook(book))
+  @PostMapping
+  fun addBook(
+    @Valid @RequestBody book: Book,
+  ): ResponseEntity<Book> = ResponseEntity.status(HttpStatus.CREATED).body(bookService.addBook(book))
 
-    @PutMapping("/{identifier}")
-    fun updateBook(
-        @PathVariable("identifier") uuid: UUID,
-        @Valid @RequestBody book: Book,
-    ): ResponseEntity<Book> = ResponseEntity.ok(bookService.updateBook(uuid, book))
+  @PutMapping("/{identifier}")
+  fun updateBook(
+    @PathVariable("identifier") uuid: UUID,
+    @Valid @RequestBody book: Book,
+  ): ResponseEntity<Book> = ResponseEntity.ok(bookService.updateBook(uuid, book))
 
-    @DeleteMapping("/{identifier}")
-    fun deleteBook(
-        @PathVariable("identifier") uuid: UUID,
-    ): ResponseEntity<Void> {
-        bookService.deleteBook(uuid)
-        return ResponseEntity.noContent().build()
-    }
+  @DeleteMapping("/{identifier}")
+  fun deleteBook(
+    @PathVariable("identifier") uuid: UUID,
+  ): ResponseEntity<Void> {
+    bookService.deleteBook(uuid)
+    return ResponseEntity.noContent().build()
+  }
 }

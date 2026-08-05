@@ -1,5 +1,5 @@
 export default {
   compilerOptions: {
-    customElement: false
-  }
+    customElement: false,
+  },
 };

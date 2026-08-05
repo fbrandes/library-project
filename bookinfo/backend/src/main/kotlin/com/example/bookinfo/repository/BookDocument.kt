@@ -10,17 +10,17 @@ import java.util.UUID
 
 @Document(collection = "books")
 data class BookDocument(
-    @Id
-    val id: UUID? = null,
-    val isbn: String,
-    val title: String,
-    val author: Author,
-    val pages: Int,
-    val publisher: Publisher,
-    val genres: List<String>,
-    val language: String,
-    val summary: String,
-    val publicationDate: LocalDate,
-    val edition: Int,
-    val type: BookType,
+  @Id
+  val id: UUID? = null,
+  val isbn: String,
+  val title: String,
+  val author: Author,
+  val pages: Int,
+  val publisher: Publisher,
+  val genres: List<String>,
+  val language: String,
+  val summary: String,
+  val publicationDate: LocalDate,
+  val edition: Int,
+  val type: BookType,
 )

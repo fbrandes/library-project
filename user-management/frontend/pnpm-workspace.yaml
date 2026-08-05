@@ -3,9 +3,7 @@ packages:
 
 onlyBuiltDependencies:
   - esbuild
-  - vue-material
 
 allowBuilds:
   esbuild: true
   unrs-resolver: true
-  vue-material: true

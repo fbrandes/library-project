@@ -1,0 +1,55 @@
+---
+import { BookInfoExperience } from '../../../bookinfo/frontend/src/components/BookInfoExperience';
+import RentingWorkspace from '../../../renting/frontend/src/components/RentingWorkspace.svelte';
+import UserManagementWorkspace from '../../../user-management/frontend/src/components/UserManagementWorkspace.vue';
+import '../styles/global.css';
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Digital Library</title>
+  </head>
+  <body>
+    <div class="library-shell">
+      <header class="library-header">
+        <div>
+          <p class="library-kicker">Digital library</p>
+          <h1>Operations Console</h1>
+        </div>
+        <nav class="library-nav" aria-label="Library domains">
+          <a href="#catalog">Catalog</a>
+          <a href="#renting">Renting</a>
+          <a href="#users">Users</a>
+        </nav>
+      </header>
+
+      <main class="library-main">
+        <section id="catalog" class="library-domain library-domain-bookinfo" aria-labelledby="catalog-heading">
+          <div class="library-domain-heading">
+            <p>Catalog</p>
+            <h2 id="catalog-heading">Books</h2>
+          </div>
+          <BookInfoExperience embedded={true} client:load />
+        </section>
+
+        <section id="renting" class="library-domain library-domain-renting" aria-labelledby="renting-heading">
+          <div class="library-domain-heading">
+            <p>Renting</p>
+            <h2 id="renting-heading">Orders</h2>
+          </div>
+          <RentingWorkspace embedded={true} client:load />
+        </section>
+
+        <section id="users" class="library-domain library-domain-users" aria-labelledby="users-heading">
+          <div class="library-domain-heading">
+            <p>Users</p>
+            <h2 id="users-heading">Accounts</h2>
+          </div>
+          <UserManagementWorkspace embedded={true} client:load />
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

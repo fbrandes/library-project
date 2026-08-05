@@ -1,4 +1,4 @@
-export type BookType = 'SOFTCOVER' | 'HARDCOVER' | 'EBOOK';
+export type BookType = "SOFTCOVER" | "HARDCOVER" | "EBOOK";
 
 export interface Address {
   street: string;
@@ -34,13 +34,13 @@ export interface Book {
 }
 
 export const orderStates = [
-  'PLACED',
-  'PROCESSED',
-  'READY_FOR_PICKUP',
-  'PICKED_UP',
-  'RETURNED',
-  'COMPLETED',
-  'LATE_FOR_RETURN',
+  "PLACED",
+  "PROCESSED",
+  "READY_FOR_PICKUP",
+  "PICKED_UP",
+  "RETURNED",
+  "COMPLETED",
+  "LATE_FOR_RETURN",
 ] as const;
 
 export type OrderState = (typeof orderStates)[number];
@@ -65,9 +65,9 @@ export function isOrderState(value: string): value is OrderState {
 }
 
 export function isActiveRentalState(state: OrderState): boolean {
-  return state !== 'RETURNED' && state !== 'COMPLETED';
+  return state !== "RETURNED" && state !== "COMPLETED";
 }
 
-export function countBooks(order: Pick<Order, 'contents'>): number {
+export function countBooks(order: Pick<Order, "contents">): number {
   return order.contents.length;
 }

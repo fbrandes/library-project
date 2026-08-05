@@ -29,7 +29,7 @@ class GatewaySecurityTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"/api/bookinfo/books", "/bookinfo/index.html"})
+    @ValueSource(strings = {"/", "/api/bookinfo/books", "/bookinfo/index.html"})
     void applicationRoutesRejectMissingToken(String path) {
         webTestClient.get()
                 .uri(path)

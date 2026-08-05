@@ -1,28 +1,28 @@
-import vue from '@vitejs/plugin-vue2';
-import { defineConfig } from 'vite';
+import vue from "@vitejs/plugin-vue";
+import { defineConfig } from "vite";
 
 export default defineConfig({
-  base: '/user-management/',
+  base: "/user-management/",
   plugins: [vue()],
   server: {
     port: 5175,
     proxy: {
-      '/api': {
-        target: 'http://localhost:8083',
+      "/api": {
+        target: "http://localhost:8083",
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
+        rewrite: (path) => path.replace(/^\/api/, ""),
       },
     },
   },
   test: {
-    environment: 'jsdom',
+    environment: "jsdom",
     globals: true,
-    setupFiles: ['./src/test/setup.ts'],
+    setupFiles: ["./src/test/setup.ts"],
     coverage: {
-      provider: 'v8',
-      reporter: ['text', 'html', 'lcov'],
-      include: ['src/**/*.ts'],
-      exclude: ['src/main.ts', 'src/vue-shims.d.ts', 'src/test/**'],
+      provider: "v8",
+      reporter: ["text", "html", "lcov"],
+      include: ["src/**/*.ts"],
+      exclude: ["src/main.ts", "src/vue-shims.d.ts", "src/test/**"],
       thresholds: {
         branches: 90,
         functions: 90,

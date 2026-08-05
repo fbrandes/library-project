@@ -5,19 +5,21 @@ import {
   type UpdateUserRequest,
   type UserRole,
   type UserStatus,
-} from '../generated/userModels.js';
-import { UserValidationError } from './user.errors.js';
+} from "../generated/userModels.js";
+import { UserValidationError } from "./user.errors.js";
 
 type UserInput = CreateUserRequest | UpdateUserRequest;
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export function isUserRole(value: unknown): value is UserRole {
-  return typeof value === 'string' && USER_ROLES.includes(value as UserRole);
+  return typeof value === "string" && USER_ROLES.includes(value as UserRole);
 }
 
 export function isUserStatus(value: unknown): value is UserStatus {
-  return typeof value === 'string' && USER_STATUSES.includes(value as UserStatus);
+  return (
+    typeof value === "string" && USER_STATUSES.includes(value as UserStatus)
+  );
 }
 
 export function normalizeUserInput(input: UserInput): UserInput {
@@ -31,42 +33,48 @@ export function normalizeUserInput(input: UserInput): UserInput {
 }
 
 export function validateUserId(id: string): string[] {
-  return id.trim() === '' ? ['id is required'] : [];
+  return id.trim() === "" ? ["id is required"] : [];
 }
 
-export function validateUserInput(input: Partial<UserInput> | null | undefined): string[] {
-  if (!input || typeof input !== 'object') {
-    return ['payload is required'];
+export function validateUserInput(
+  input: Partial<UserInput> | null | undefined,
+): string[] {
+  if (!input || typeof input !== "object") {
+    return ["payload is required"];
   }
 
   const problems: string[] = [];
-  const email = typeof input.email === 'string' ? input.email.trim() : '';
-  const firstName = typeof input.firstName === 'string' ? input.firstName.trim() : '';
-  const lastName = typeof input.lastName === 'string' ? input.lastName.trim() : '';
+  const email = typeof input.email === "string" ? input.email.trim() : "";
+  const firstName =
+    typeof input.firstName === "string" ? input.firstName.trim() : "";
+  const lastName =
+    typeof input.lastName === "string" ? input.lastName.trim() : "";
 
-  if (email === '') {
-    problems.push('email is required');
+  if (email === "") {
+    problems.push("email is required");
   } else if (!emailPattern.test(email)) {
-    problems.push('email must be valid');
+    problems.push("email must be valid");
   }
 
-  if (firstName === '') {
-    problems.push('firstName is required');
+  if (firstName === "") {
+    problems.push("firstName is required");
   }
-  if (lastName === '') {
-    problems.push('lastName is required');
+  if (lastName === "") {
+    problems.push("lastName is required");
   }
   if (!isUserRole(input.role)) {
-    problems.push('role is invalid');
+    problems.push("role is invalid");
   }
   if (!isUserStatus(input.status)) {
-    problems.push('status is invalid');
+    problems.push("status is invalid");
   }
 
   return problems;
 }
 
-export function parseUserInput(input: Partial<UserInput> | null | undefined): UserInput {
+export function parseUserInput(
+  input: Partial<UserInput> | null | undefined,
+): UserInput {
   const problems = validateUserInput(input);
   if (problems.length > 0) {
     throw new UserValidationError(problems);

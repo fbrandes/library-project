@@ -1,8 +1,14 @@
-import { useStore } from 'zustand';
-import { createStore } from 'zustand/vanilla';
+import { useStore } from "zustand";
+import { createStore } from "zustand/vanilla";
 
-import { bookApi, type BookApi } from '../services/bookApi';
-import { getAuthorDisplayName, type Book, type FilterField, type SearchField, type ThemeMode } from '../types/book';
+import { bookApi, type BookApi } from "../services/bookApi";
+import {
+  getAuthorDisplayName,
+  type Book,
+  type FilterField,
+  type SearchField,
+  type ThemeMode,
+} from "../types/book";
 
 export interface BookInfoState {
   books: Book[];
@@ -31,27 +37,36 @@ export interface BookInfoActions {
 export type BookInfoStore = BookInfoState & BookInfoActions;
 
 export function getPreferredThemeMode(): ThemeMode {
-  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
-    return 'light';
+  if (
+    typeof window === "undefined" ||
+    typeof window.matchMedia !== "function"
+  ) {
+    return "light";
   }
 
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  return window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
 }
 
 export function createInitialState(themeMode: ThemeMode): BookInfoState {
   return {
     books: [],
     error: null,
-    filterField: 'title',
-    filterQuery: '',
+    filterField: "title",
+    filterQuery: "",
     isLoading: false,
-    searchField: 'isbn',
-    searchQuery: '',
+    searchField: "isbn",
+    searchQuery: "",
     themeMode,
   };
 }
 
-export function filterBooks(books: Book[], field: SearchField | FilterField, query: string): Book[] {
+export function filterBooks(
+  books: Book[],
+  field: SearchField | FilterField,
+  query: string,
+): Book[] {
   const normalizedQuery = query.trim().toLocaleLowerCase();
 
   if (!normalizedQuery) {
@@ -59,12 +74,17 @@ export function filterBooks(books: Book[], field: SearchField | FilterField, que
   }
 
   return books.filter((book) =>
-    getSearchableBookValue(book, field).toLocaleLowerCase().includes(normalizedQuery),
+    getSearchableBookValue(book, field)
+      .toLocaleLowerCase()
+      .includes(normalizedQuery),
   );
 }
 
-function getSearchableBookValue(book: Book, field: SearchField | FilterField): string {
-  if (field === 'author') {
+function getSearchableBookValue(
+  book: Book,
+  field: SearchField | FilterField,
+): string {
+  if (field === "author") {
     return getAuthorDisplayName(book.author);
   }
 
@@ -76,7 +96,7 @@ function toUserMessage(error: unknown): string {
     return error.message;
   }
 
-  return 'Unable to fetch books.';
+  return "Unable to fetch books.";
 }
 
 export function createBookInfoStore(
@@ -106,7 +126,7 @@ export function createBookInfoStore(
       const { searchField, searchQuery } = get();
       const query = searchQuery.trim();
 
-      set({ error: null, filterQuery: '', isLoading: true });
+      set({ error: null, filterQuery: "", isLoading: true });
 
       try {
         if (!query) {
@@ -115,7 +135,7 @@ export function createBookInfoStore(
           return;
         }
 
-        if (searchField === 'isbn') {
+        if (searchField === "isbn") {
           const book = await api.getBookByIsbn(query);
           set({ books: book ? [book] : [], error: null, isLoading: false });
           return;
@@ -148,7 +168,7 @@ export function createBookInfoStore(
     },
     toggleThemeMode: () => {
       set(({ themeMode }) => ({
-        themeMode: themeMode === 'dark' ? 'light' : 'dark',
+        themeMode: themeMode === "dark" ? "light" : "dark",
       }));
     },
   }));

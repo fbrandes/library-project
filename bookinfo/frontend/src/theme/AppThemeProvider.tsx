@@ -6,9 +6,10 @@ import { useBookInfoStore } from '../stores/bookInfoStore';
 
 interface AppThemeProviderProps {
   children: ReactNode;
+  includeCssBaseline?: boolean;
 }
 
-export function AppThemeProvider({ children }: AppThemeProviderProps) {
+export function AppThemeProvider({ children, includeCssBaseline = true }: AppThemeProviderProps) {
   const themeMode = useBookInfoStore((state) => state.themeMode);
 
   const theme = useMemo(
@@ -32,7 +33,7 @@ export function AppThemeProvider({ children }: AppThemeProviderProps) {
 
   return (
     <ThemeProvider theme={theme}>
-      <CssBaseline />
+      {includeCssBaseline ? <CssBaseline /> : null}
       {children}
     </ThemeProvider>
   );

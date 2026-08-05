@@ -1,5 +1,5 @@
 package com.example.bookinfo.service
 
 class BookNotFoundException(
-    message: String,
+  message: String,
 ) : RuntimeException(message)

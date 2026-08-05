@@ -16,7 +16,7 @@ export interface Author {
   bio: string;
 }
 
-export type BookType = 'softcover' | 'hardcover' | 'ebook';
+export type BookType = "softcover" | "hardcover" | "ebook";
 
 export interface Book {
   id?: string;
@@ -33,15 +33,15 @@ export interface Book {
   type: BookType;
 }
 
-export type SearchField = 'isbn' | 'title' | 'author';
+export type SearchField = "isbn" | "title" | "author";
 
-export type FilterField = 'title' | 'author';
+export type FilterField = "title" | "author";
 
-export type ThemeMode = 'light' | 'dark';
+export type ThemeMode = "light" | "dark";
 
 export function getAuthorDisplayName(author: Author): string {
   return [author.firstname, author.middlename, author.lastname]
     .map((part) => part.trim())
     .filter(Boolean)
-    .join(' ');
+    .join(" ");
 }

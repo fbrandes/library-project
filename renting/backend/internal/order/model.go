@@ -197,13 +197,13 @@ func validateBook(book Book, index int) []string {
 	prefix := fmt.Sprintf("contents[%d]", index)
 
 	required := map[string]string{
-		"isbn":                   book.ISBN,
-		"title":                  book.Title,
-		"author.firstname":       book.Author.FirstName,
-		"author.lastname":        book.Author.LastName,
-		"author.bio":             book.Author.Bio,
-		"publisher.name":         book.Publisher.Name,
-		"publisher.address.city": book.Publisher.Address.City,
+		"isbn":                      book.ISBN,
+		"title":                     book.Title,
+		"author.firstname":          book.Author.FirstName,
+		"author.lastname":           book.Author.LastName,
+		"author.bio":                book.Author.Bio,
+		"publisher.name":            book.Publisher.Name,
+		"publisher.address.city":    book.Publisher.Address.City,
 		"publisher.address.zipCode": book.Publisher.Address.ZipCode,
 		"publisher.address.street":  book.Publisher.Address.Street,
 		"language":                  book.Language,

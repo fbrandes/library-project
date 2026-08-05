@@ -1,4 +1,4 @@
-import type { Book } from '../types/order';
+import type { Book } from "../types/order";
 
 export function normalizeIsbn(isbn: string): string {
   return isbn.trim();
@@ -12,25 +12,25 @@ export function createBookFromInput(isbn: string, title: string): Book {
     isbn: normalizedIsbn,
     title: normalizedTitle,
     author: {
-      firstname: 'Unknown',
-      middlename: '',
-      lastname: 'Author',
-      bio: 'Book metadata supplied by the renting order.',
+      firstname: "Unknown",
+      middlename: "",
+      lastname: "Author",
+      bio: "Book metadata supplied by the renting order.",
     },
     pages: 1,
     publisher: {
-      name: 'Unknown Publisher',
+      name: "Unknown Publisher",
       address: {
-        street: 'Unknown Street',
-        zipCode: '00000',
-        city: 'Unknown City',
+        street: "Unknown Street",
+        zipCode: "00000",
+        city: "Unknown City",
       },
     },
-    genres: ['Rental'],
-    language: 'Unknown',
-    summary: 'Rental order book entry.',
+    genres: ["Rental"],
+    language: "Unknown",
+    summary: "Rental order book entry.",
     publicationDate: new Date().toISOString().slice(0, 10),
     edition: 1,
-    type: 'HARDCOVER',
+    type: "HARDCOVER",
   };
 }

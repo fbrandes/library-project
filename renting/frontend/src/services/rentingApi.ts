@@ -1,6 +1,8 @@
-import type { Order, OrderInput } from '../types/order';
+import type { Order, OrderInput } from "../types/order";
 
-const API_BASE_URL = (import.meta.env.VITE_RENTING_API_BASE_URL ?? '/api').replace(/\/$/, '');
+const API_BASE_URL = (
+  import.meta.env.VITE_RENTING_API_BASE_URL ?? "/api"
+).replace(/\/$/, "");
 
 export interface RentingApi {
   getOrders: () => Promise<Order[]>;
@@ -16,7 +18,7 @@ export class ApiError extends Error {
     message: string,
   ) {
     super(message);
-    this.name = 'ApiError';
+    this.name = "ApiError";
   }
 }
 
@@ -32,7 +34,7 @@ async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(buildUrl(path), {
     ...init,
     headers: {
-      Accept: 'application/json',
+      Accept: "application/json",
       ...init?.headers,
     },
   });
@@ -46,22 +48,22 @@ async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
 
 function jsonRequest(input: OrderInput): RequestInit {
   return {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
     body: JSON.stringify(input),
   };
 }
 
 export function getOrders(): Promise<Order[]> {
-  return fetchJson<Order[]>('/orders');
+  return fetchJson<Order[]>("/orders");
 }
 
 export async function getOrder(id: string): Promise<Order | null> {
   const response = await fetch(buildUrl(`/orders/${encodeURIComponent(id)}`), {
     headers: {
-      Accept: 'application/json',
+      Accept: "application/json",
     },
   });
 
@@ -76,21 +78,21 @@ export async function getOrder(id: string): Promise<Order | null> {
 }
 
 export function createOrder(input: OrderInput): Promise<Order> {
-  return fetchJson<Order>('/orders', jsonRequest(input));
+  return fetchJson<Order>("/orders", jsonRequest(input));
 }
 
 export function updateOrder(id: string, input: OrderInput): Promise<Order> {
   return fetchJson<Order>(`/orders/${encodeURIComponent(id)}`, {
     ...jsonRequest(input),
-    method: 'PUT',
+    method: "PUT",
   });
 }
 
 export async function deleteOrder(id: string): Promise<void> {
   const response = await fetch(buildUrl(`/orders/${encodeURIComponent(id)}`), {
-    method: 'DELETE',
+    method: "DELETE",
     headers: {
-      Accept: 'application/json',
+      Accept: "application/json",
     },
   });
 

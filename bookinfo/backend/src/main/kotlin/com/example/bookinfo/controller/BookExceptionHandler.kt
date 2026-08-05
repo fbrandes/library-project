@@ -18,158 +18,168 @@ import tools.jackson.module.kotlin.KotlinInvalidNullException
 
 @RestControllerAdvice
 class BookExceptionHandler {
-    @ExceptionHandler(BookNotFoundException::class)
-    fun handleBookNotFound(exception: BookNotFoundException): ResponseEntity<ErrorResponse> =
-        errorResponse(HttpStatus.NOT_FOUND, exception.message ?: "Book not found")
+  @ExceptionHandler(BookNotFoundException::class)
+  fun handleBookNotFound(exception: BookNotFoundException): ResponseEntity<ErrorResponse> =
+    errorResponse(HttpStatus.NOT_FOUND, exception.message ?: "Book not found")
 
-    @ExceptionHandler(DuplicateKeyException::class)
-    fun handleDuplicateKey(): ResponseEntity<ErrorResponse> = errorResponse(HttpStatus.CONFLICT, "Book with ISBN already exists")
+  @ExceptionHandler(DuplicateKeyException::class)
+  fun handleDuplicateKey(): ResponseEntity<ErrorResponse> = errorResponse(HttpStatus.CONFLICT, "Book with ISBN already exists")
 
-    @ExceptionHandler(MethodArgumentNotValidException::class)
-    fun handleValidationFailure(exception: MethodArgumentNotValidException): ResponseEntity<ErrorResponse> {
-        val details =
-            exception.bindingResult.fieldErrors.map {
-                ErrorDetail(field = it.field, message = it.defaultMessage ?: "Invalid value")
-            } +
-                exception.bindingResult.globalErrors.map {
-                    ErrorDetail(field = it.objectName, message = it.defaultMessage ?: "Invalid value")
-                }
-
-        return errorResponse(HttpStatus.BAD_REQUEST, "Request validation failed", details)
-    }
-
-    @ExceptionHandler(HttpMessageNotReadableException::class)
-    fun handleUnreadableMessage(exception: HttpMessageNotReadableException): ResponseEntity<ErrorResponse> =
-        errorResponse(
-            HttpStatus.BAD_REQUEST,
-            "Request body could not be parsed",
-            exception.toErrorDetails(),
-        )
-
-    @ExceptionHandler(MethodArgumentTypeMismatchException::class)
-    fun handleTypeMismatch(exception: MethodArgumentTypeMismatchException): ResponseEntity<ErrorResponse> {
-        val value = exception.value?.toString() ?: "null"
-        val details =
-            listOf(
-                ErrorDetail(
-                    field = exception.name,
-                    message = "Invalid value '$value'. Expected ${expectedType(exception.requiredType)}",
-                ),
-            )
-
-        return errorResponse(HttpStatus.BAD_REQUEST, "Request parameter validation failed", details)
-    }
-
-    private fun errorResponse(
-        status: HttpStatus,
-        message: String,
-        details: List<ErrorDetail> = emptyList(),
-    ): ResponseEntity<ErrorResponse> =
-        ResponseEntity.status(status).body(
-            ErrorResponse(
-                status = status.value(),
-                error = status.reasonPhrase,
-                message = message,
-                details = details,
-            ),
-        )
-
-    private fun HttpMessageNotReadableException.toErrorDetails(): List<ErrorDetail> {
-        findCause<InvalidFormatException>()?.let { return listOf(it.toErrorDetail()) }
-        findCause<KotlinInvalidNullException>()?.let {
-            return listOf(
-                ErrorDetail(
-                    field = it.fieldPath() ?: it.kotlinPropertyName,
-                    message = "Missing required field",
-                ),
-            )
-        }
-        findCause<MismatchedInputException>()?.let {
-            return listOf(
-                ErrorDetail(
-                    field = it.fieldPath(),
-                    message = "Invalid JSON value. Expected ${expectedType(it.targetType)}",
-                ),
-            )
-        }
-        findCause<StreamReadException>()?.let {
-            return listOf(ErrorDetail(message = "Malformed JSON: ${it.originalMessage}"))
+  @ExceptionHandler(MethodArgumentNotValidException::class)
+  fun handleValidationFailure(exception: MethodArgumentNotValidException): ResponseEntity<ErrorResponse> {
+    val details =
+      exception.bindingResult.fieldErrors.map {
+        ErrorDetail(field = it.field, message = it.defaultMessage ?: "Invalid value")
+      } +
+        exception.bindingResult.globalErrors.map {
+          ErrorDetail(field = it.objectName, message = it.defaultMessage ?: "Invalid value")
         }
 
-        return listOf(ErrorDetail(message = "Request body is malformed or contains unsupported values"))
+    return errorResponse(HttpStatus.BAD_REQUEST, "Request validation failed", details)
+  }
+
+  @ExceptionHandler(HttpMessageNotReadableException::class)
+  fun handleUnreadableMessage(exception: HttpMessageNotReadableException): ResponseEntity<ErrorResponse> =
+    errorResponse(
+      HttpStatus.BAD_REQUEST,
+      "Request body could not be parsed",
+      exception.toErrorDetails(),
+    )
+
+  @ExceptionHandler(MethodArgumentTypeMismatchException::class)
+  fun handleTypeMismatch(exception: MethodArgumentTypeMismatchException): ResponseEntity<ErrorResponse> {
+    val value = exception.value?.toString() ?: "null"
+    val details =
+      listOf(
+        ErrorDetail(
+          field = exception.name,
+          message = "Invalid value '$value'. Expected ${expectedType(exception.requiredType)}",
+        ),
+      )
+
+    return errorResponse(HttpStatus.BAD_REQUEST, "Request parameter validation failed", details)
+  }
+
+  private fun errorResponse(
+    status: HttpStatus,
+    message: String,
+    details: List<ErrorDetail> = emptyList(),
+  ): ResponseEntity<ErrorResponse> =
+    ResponseEntity.status(status).body(
+      ErrorResponse(
+        status = status.value(),
+        error = status.reasonPhrase,
+        message = message,
+        details = details,
+      ),
+    )
+
+  private fun HttpMessageNotReadableException.toErrorDetails(): List<ErrorDetail> {
+    findCause<InvalidFormatException>()?.let { return listOf(it.toErrorDetail()) }
+    findCause<KotlinInvalidNullException>()?.let {
+      return listOf(
+        ErrorDetail(
+          field = it.fieldPath() ?: it.kotlinPropertyName,
+          message = "Missing required field",
+        ),
+      )
+    }
+    findCause<MismatchedInputException>()?.let {
+      return listOf(
+        ErrorDetail(
+          field = it.fieldPath(),
+          message = "Invalid JSON value. Expected ${expectedType(it.targetType)}",
+        ),
+      )
+    }
+    findCause<StreamReadException>()?.let {
+      return listOf(ErrorDetail(message = "Malformed JSON: ${it.originalMessage}"))
     }
 
-    private fun InvalidFormatException.toErrorDetail(): ErrorDetail {
-        val value = value?.toString() ?: "null"
-        val message =
-            when {
-                targetType?.isEnum == true ->
-                    "Invalid value '$value'. Expected one of: ${targetType.enumConstants.joinToString(", ")}"
-                targetType == java.time.LocalDate::class.java ->
-                    "Invalid date '$value'. Expected format yyyy-MM-dd"
-                else ->
-                    "Invalid value '$value'. Expected ${expectedType(targetType)}"
-            }
+    return listOf(ErrorDetail(message = "Request body is malformed or contains unsupported values"))
+  }
 
-        return ErrorDetail(field = fieldPath(), message = message)
-    }
-
-    private fun JacksonException.fieldPath(): String? {
-        val fieldPath =
-            path
-                .mapNotNull { reference ->
-                    reference.propertyName ?: reference.index.takeIf { it >= 0 }?.let { "[$it]" }
-                }.joinToString(".")
-                .replace(".[", "[")
-
-        return fieldPath.ifBlank { null }
-    }
-
-    private fun expectedType(type: Class<*>?): String =
-        when (type) {
-            null -> "the expected type"
-            String::class.java -> "string"
-            Int::class.java,
-            Int::class.javaObjectType,
-            Long::class.java,
-            Long::class.javaObjectType,
-            Double::class.java,
-            Double::class.javaObjectType,
-            Float::class.java,
-            Float::class.javaObjectType,
-            -> "number"
-            Boolean::class.java,
-            Boolean::class.javaObjectType,
-            -> "boolean"
-            java.time.LocalDate::class.java -> "date in format yyyy-MM-dd"
-            else -> type.simpleName
+  private fun InvalidFormatException.toErrorDetail(): ErrorDetail {
+    val value = value?.toString() ?: "null"
+    val message =
+      when {
+        targetType?.isEnum == true -> {
+          "Invalid value '$value'. Expected one of: ${targetType.enumConstants.joinToString(", ")}"
         }
 
-    private inline fun <reified T : Throwable> Throwable.findCause(): T? {
-        var current: Throwable? = this
-
-        while (current != null) {
-            if (current is T) {
-                return current
-            }
-
-            current = current.cause
+        targetType == java.time.LocalDate::class.java -> {
+          "Invalid date '$value'. Expected format yyyy-MM-dd"
         }
 
-        return null
+        else -> {
+          "Invalid value '$value'. Expected ${expectedType(targetType)}"
+        }
+      }
+
+    return ErrorDetail(field = fieldPath(), message = message)
+  }
+
+  private fun JacksonException.fieldPath(): String? {
+    val fieldPath =
+      path
+        .mapNotNull { reference ->
+          reference.propertyName ?: reference.index.takeIf { it >= 0 }?.let { "[$it]" }
+        }.joinToString(".")
+        .replace(".[", "[")
+
+    return fieldPath.ifBlank { null }
+  }
+
+  private fun expectedType(type: Class<*>?): String =
+    when (type) {
+      null -> "the expected type"
+
+      String::class.java -> "string"
+
+      Int::class.java,
+      Int::class.javaObjectType,
+      Long::class.java,
+      Long::class.javaObjectType,
+      Double::class.java,
+      Double::class.javaObjectType,
+      Float::class.java,
+      Float::class.javaObjectType,
+      -> "number"
+
+      Boolean::class.java,
+      Boolean::class.javaObjectType,
+      -> "boolean"
+
+      java.time.LocalDate::class.java -> "date in format yyyy-MM-dd"
+
+      else -> type.simpleName
     }
+
+  private inline fun <reified T : Throwable> Throwable.findCause(): T? {
+    var current: Throwable? = this
+
+    while (current != null) {
+      if (current is T) {
+        return current
+      }
+
+      current = current.cause
+    }
+
+    return null
+  }
 }
 
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 data class ErrorResponse(
-    val status: Int,
-    val error: String,
-    val message: String,
-    val details: List<ErrorDetail> = emptyList(),
+  val status: Int,
+  val error: String,
+  val message: String,
+  val details: List<ErrorDetail> = emptyList(),
 )
 
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 data class ErrorDetail(
-    val field: String? = null,
-    val message: String,
+  val field: String? = null,
+  val message: String,
 )

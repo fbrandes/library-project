@@ -1,12 +1,26 @@
-import { BadRequestException, Inject, Injectable, NotFoundException, Optional } from '@nestjs/common';
-import { randomUUID } from 'node:crypto';
-import type { CreateUserRequest, UpdateUserRequest, User } from '../generated/userModels.js';
-import { UserNotFoundError } from './user.errors.js';
-import { normalizeUserInput, validateUserId, validateUserInput } from './user.validation.js';
-import { USERS_REPOSITORY, type UsersRepository } from './users.repository.js';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  NotFoundException,
+  Optional,
+} from "@nestjs/common";
+import { randomUUID } from "node:crypto";
+import type {
+  CreateUserRequest,
+  UpdateUserRequest,
+  User,
+} from "../generated/userModels.js";
+import { UserNotFoundError } from "./user.errors.js";
+import {
+  normalizeUserInput,
+  validateUserId,
+  validateUserInput,
+} from "./user.validation.js";
+import { USERS_REPOSITORY, type UsersRepository } from "./users.repository.js";
 
 export type Clock = () => Date;
-export const USER_MANAGEMENT_CLOCK = Symbol('USER_MANAGEMENT_CLOCK');
+export const USER_MANAGEMENT_CLOCK = Symbol("USER_MANAGEMENT_CLOCK");
 
 @Injectable()
 export class UsersService {
@@ -31,7 +45,11 @@ export class UsersService {
   async update(id: string, input: UpdateUserRequest): Promise<User> {
     const userId = this.parseId(id);
     const normalized = this.parseInput(input);
-    const updated = await this.repository.update(userId, normalized, this.clock().toISOString());
+    const updated = await this.repository.update(
+      userId,
+      normalized,
+      this.clock().toISOString(),
+    );
     if (!updated) {
       throw this.notFound(userId);
     }
@@ -55,11 +73,13 @@ export class UsersService {
     }
   }
 
-  private parseInput(input: CreateUserRequest | UpdateUserRequest): CreateUserRequest {
+  private parseInput(
+    input: CreateUserRequest | UpdateUserRequest,
+  ): CreateUserRequest {
     const problems = validateUserInput(input);
     if (problems.length > 0) {
       throw new BadRequestException({
-        message: 'Invalid user payload',
+        message: "Invalid user payload",
         problems,
       });
     }
@@ -71,7 +91,7 @@ export class UsersService {
     const problems = validateUserId(normalized);
     if (problems.length > 0) {
       throw new BadRequestException({
-        message: 'Invalid user id',
+        message: "Invalid user id",
         problems,
       });
     }

@@ -1,7 +1,13 @@
-import { createStore } from 'zustand/vanilla';
+import { createStore } from "zustand/vanilla";
 
-import { rentingApi, type RentingApi } from '../services/rentingApi';
-import { isActiveRentalState, type Book, type Order, type OrderInput, type OrderState } from '../types/order';
+import { rentingApi, type RentingApi } from "../services/rentingApi";
+import {
+  isActiveRentalState,
+  type Book,
+  type Order,
+  type OrderInput,
+  type OrderState,
+} from "../types/order";
 
 export interface RentingState {
   error: string | null;
@@ -24,7 +30,7 @@ export interface RentingActions {
 
 export type RentingStore = RentingState & RentingActions;
 
-export function createInitialState(userId = 'user-123'): RentingState {
+export function createInitialState(userId = "user-123"): RentingState {
   return {
     error: null,
     isLoading: false,
@@ -34,31 +40,45 @@ export function createInitialState(userId = 'user-123'): RentingState {
   };
 }
 
-export function getCurrentRentedOrders(orders: Order[], userId: string): Order[] {
-  return orders.filter((order) => order.userId === userId && isActiveRentalState(order.state));
+export function getCurrentRentedOrders(
+  orders: Order[],
+  userId: string,
+): Order[] {
+  return orders.filter(
+    (order) => order.userId === userId && isActiveRentalState(order.state),
+  );
 }
 
 export function getCurrentRentedBooks(orders: Order[], userId: string): Book[] {
-  return getCurrentRentedOrders(orders, userId).flatMap((order) => order.contents);
+  return getCurrentRentedOrders(orders, userId).flatMap(
+    (order) => order.contents,
+  );
 }
 
 export function replaceOrder(orders: Order[], order: Order): Order[] {
-  const existingIndex = orders.findIndex((candidate) => candidate.id === order.id);
+  const existingIndex = orders.findIndex(
+    (candidate) => candidate.id === order.id,
+  );
   if (existingIndex === -1) {
     return [order, ...orders];
   }
 
-  return orders.map((candidate) => (candidate.id === order.id ? order : candidate));
+  return orders.map((candidate) =>
+    candidate.id === order.id ? order : candidate,
+  );
 }
 
 export function toUserMessage(error: unknown): string {
   if (error instanceof Error && error.message) {
     return error.message;
   }
-  return 'Unable to complete renting request.';
+  return "Unable to complete renting request.";
 }
 
-export function createRentingStore(api: RentingApi = rentingApi, initialUserId = 'user-123') {
+export function createRentingStore(
+  api: RentingApi = rentingApi,
+  initialUserId = "user-123",
+) {
   return createStore<RentingStore>((set, get) => ({
     ...createInitialState(initialUserId),
     cancelOrder: async (id) => {
@@ -75,19 +95,24 @@ export function createRentingStore(api: RentingApi = rentingApi, initialUserId =
         set({ error: toUserMessage(error), isLoading: false });
       }
     },
-    getCurrentRentedBooks: (userId = get().userId) => getCurrentRentedBooks(get().orders, userId),
+    getCurrentRentedBooks: (userId = get().userId) =>
+      getCurrentRentedBooks(get().orders, userId),
     loadOrder: async (id) => {
       set({ error: null, isLoading: true });
       try {
         const selectedOrder = await api.getOrder(id);
         set(({ orders }) => ({
-          error: selectedOrder ? null : 'Order not found.',
+          error: selectedOrder ? null : "Order not found.",
           isLoading: false,
           orders: selectedOrder ? replaceOrder(orders, selectedOrder) : orders,
           selectedOrder,
         }));
       } catch (error) {
-        set({ error: toUserMessage(error), isLoading: false, selectedOrder: null });
+        set({
+          error: toUserMessage(error),
+          isLoading: false,
+          selectedOrder: null,
+        });
       }
     },
     loadOrders: async () => {
@@ -138,11 +163,11 @@ export function createRentingStore(api: RentingApi = rentingApi, initialUserId =
 
 export function getNextState(state: OrderState): OrderState {
   const transitions: Partial<Record<OrderState, OrderState>> = {
-    PLACED: 'PROCESSED',
-    PROCESSED: 'READY_FOR_PICKUP',
-    READY_FOR_PICKUP: 'PICKED_UP',
-    PICKED_UP: 'RETURNED',
-    RETURNED: 'COMPLETED',
+    PLACED: "PROCESSED",
+    PROCESSED: "READY_FOR_PICKUP",
+    READY_FOR_PICKUP: "PICKED_UP",
+    PICKED_UP: "RETURNED",
+    RETURNED: "COMPLETED",
   };
 
   return transitions[state] ?? state;

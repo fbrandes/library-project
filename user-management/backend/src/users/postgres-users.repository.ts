@@ -1,9 +1,19 @@
-import { Inject, Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
-import type { Pool } from 'pg';
-import { randomUUID } from 'node:crypto';
-import { USER_MANAGEMENT_POOL } from '../database/database.module.js';
-import type { CreateUserRequest, User, UserRole, UserStatus } from '../generated/userModels.js';
-import type { UsersRepository } from './users.repository.js';
+import {
+  Inject,
+  Injectable,
+  OnModuleDestroy,
+  OnModuleInit,
+} from "@nestjs/common";
+import type { Pool } from "pg";
+import { randomUUID } from "node:crypto";
+import { USER_MANAGEMENT_POOL } from "../database/database.module.js";
+import type {
+  CreateUserRequest,
+  User,
+  UserRole,
+  UserStatus,
+} from "../generated/userModels.js";
+import type { UsersRepository } from "./users.repository.js";
 
 type UserRow = {
   id: string;
@@ -28,7 +38,9 @@ const userColumns = `
 `;
 
 export function toIsoString(value: Date | string): string {
-  return value instanceof Date ? value.toISOString() : new Date(value).toISOString();
+  return value instanceof Date
+    ? value.toISOString()
+    : new Date(value).toISOString();
 }
 
 export function mapUserRow(row: UserRow): User {
@@ -45,7 +57,9 @@ export function mapUserRow(row: UserRow): User {
 }
 
 @Injectable()
-export class PostgresUsersRepository implements UsersRepository, OnModuleInit, OnModuleDestroy {
+export class PostgresUsersRepository
+  implements UsersRepository, OnModuleInit, OnModuleDestroy
+{
   constructor(@Inject(USER_MANAGEMENT_POOL) private readonly pool: Pool) {}
 
   async onModuleInit(): Promise<void> {
@@ -95,7 +109,11 @@ export class PostgresUsersRepository implements UsersRepository, OnModuleInit, O
     return mapUserRow(result.rows[0]);
   }
 
-  async update(id: string, input: CreateUserRequest, updatedAt: string): Promise<User | null> {
+  async update(
+    id: string,
+    input: CreateUserRequest,
+    updatedAt: string,
+  ): Promise<User | null> {
     const result = await this.pool.query<UserRow>(
       `
         UPDATE users
@@ -108,7 +126,15 @@ export class PostgresUsersRepository implements UsersRepository, OnModuleInit, O
         WHERE id = $1
         RETURNING ${userColumns}
       `,
-      [id, input.email, input.firstName, input.lastName, input.role, input.status, updatedAt],
+      [
+        id,
+        input.email,
+        input.firstName,
+        input.lastName,
+        input.role,
+        input.status,
+        updatedAt,
+      ],
     );
 
     return result.rows[0] ? mapUserRow(result.rows[0]) : null;
@@ -128,7 +154,9 @@ export class PostgresUsersRepository implements UsersRepository, OnModuleInit, O
   }
 
   async delete(id: string): Promise<boolean> {
-    const result = await this.pool.query('DELETE FROM users WHERE id = $1', [id]);
+    const result = await this.pool.query("DELETE FROM users WHERE id = $1", [
+      id,
+    ]);
     return (result.rowCount ?? 0) > 0;
   }
 }

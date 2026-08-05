@@ -1,8 +1,10 @@
-declare module '*.vue' {
-  import Vue from 'vue';
-  export default Vue;
-}
+declare module "*.vue" {
+  import type { DefineComponent } from "vue";
 
-declare module 'vue-material';
-declare module 'vue-material/dist/vue-material.min.css';
-declare module 'vue-material/dist/theme/default.css';
+  const component: DefineComponent<
+    Record<string, never>,
+    Record<string, never>,
+    unknown
+  >;
+  export default component;
+}

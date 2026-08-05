@@ -30,16 +30,12 @@ class GatewayRoutesTest {
     private static final MockWebServer BOOKINFO_API = new MockWebServer();
     private static final MockWebServer RENTING_API = new MockWebServer();
     private static final MockWebServer USER_MANAGEMENT_API = new MockWebServer();
-    private static final MockWebServer BOOKINFO_UI = new MockWebServer();
-    private static final MockWebServer RENTING_UI = new MockWebServer();
-    private static final MockWebServer USER_MANAGEMENT_UI = new MockWebServer();
+    private static final MockWebServer FRONTEND_UI = new MockWebServer();
     private static final List<MockWebServer> TARGET_SERVERS = List.of(
             BOOKINFO_API,
             RENTING_API,
             USER_MANAGEMENT_API,
-            BOOKINFO_UI,
-            RENTING_UI,
-            USER_MANAGEMENT_UI);
+            FRONTEND_UI);
 
     static {
         for (MockWebServer server : TARGET_SERVERS) {
@@ -59,9 +55,7 @@ class GatewayRoutesTest {
         registry.add("BOOKINFO_API_URI", () -> serverUrl(BOOKINFO_API));
         registry.add("RENTING_API_URI", () -> serverUrl(RENTING_API));
         registry.add("USER_MANAGEMENT_API_URI", () -> serverUrl(USER_MANAGEMENT_API));
-        registry.add("BOOKINFO_UI_URI", () -> serverUrl(BOOKINFO_UI));
-        registry.add("RENTING_UI_URI", () -> serverUrl(RENTING_UI));
-        registry.add("USER_MANAGEMENT_UI_URI", () -> serverUrl(USER_MANAGEMENT_UI));
+        registry.add("FRONTEND_UI_URI", () -> serverUrl(FRONTEND_UI));
     }
 
     @AfterAll
@@ -117,25 +111,25 @@ class GatewayRoutesTest {
                         "{\"service\":\"user-management\"}",
                         "application/json"),
                 new RouteCase(
-                        "bookinfo UI",
-                        BOOKINFO_UI,
-                        "/bookinfo/assets/index.js",
-                        "/assets/index.js",
-                        "bookinfo-ui",
-                        "text/plain"),
-                new RouteCase(
-                        "renting UI",
-                        RENTING_UI,
-                        "/renting/",
+                        "frontend UI",
+                        FRONTEND_UI,
                         "/",
-                        "renting-ui",
+                        "/",
+                        "frontend-ui",
+                        "text/html"),
+                new RouteCase(
+                        "frontend assets",
+                        FRONTEND_UI,
+                        "/assets/index.js",
+                        "/assets/index.js",
+                        "frontend-asset",
                         "text/plain"),
                 new RouteCase(
-                        "user-management UI",
-                        USER_MANAGEMENT_UI,
+                        "legacy UI paths",
+                        FRONTEND_UI,
                         "/user-management/assets/index.js",
-                        "/assets/index.js",
-                        "user-management-ui",
+                        "/user-management/assets/index.js",
+                        "frontend-ui",
                         "text/plain"));
     }
 
