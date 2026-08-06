@@ -25,7 +25,10 @@ jobs:
           fetch-depth: 0
       - id: detect
         shell: bash
+        working-directory: .cicd
         run: |
+          pwd
+          task --list
           result="$(task detect-changed-services)"
           echo "has_changes=$(printf '%s' "$result" | jq -r '.has_changes')" >> "$GITHUB_OUTPUT"
           echo "matrix=$(printf '%s' "$result" | jq -c '.matrix')" >> "$GITHUB_OUTPUT"
@@ -46,4 +49,4 @@ jobs:
       - uses: actions/checkout@v5
         with:
           fetch-depth: 0
-      - run: task app:${{ matrix.service }}:build
+      - run: task ${{ matrix.service }}:build
