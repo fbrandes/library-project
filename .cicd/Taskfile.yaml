@@ -36,10 +36,3 @@ tasks:
         sh: git rev-parse HEAD
     cmds:
       - ./scripts/detect_changed_services.sh "{{.BASE_SHA}}" "{{.HEAD_SHA}}" bookinfo gateway renting user-management
-
-  open-api-diff:
-    desc: "Run openapi-diff"
-    cmd: |
-      curl -sL https://raw.githubusercontent.com/fbrandes/library-project/refs/heads/main/api/spec/{{.API_SPEC_FILE}} -o old.yaml
-      cp ../api/spec/{{.API_SPEC_FILE}} new.yaml
-      docker run --rm -v $(pwd):/workspace -w /workspace openapitools/openapi-diff:latest -fail-on-incompatible old.yaml new.yaml

@@ -52,6 +52,14 @@ tasks:
       -v "{{.ROOT_DIR}}:/tmp/lint" \
       ghcr.io/super-linter/super-linter:latest
 
+  open-api-diff:
+    desc: "Run openapi-diff"
+    dir: api/spec
+    cmd: |
+      curl -sL https://raw.githubusercontent.com/fbrandes/library-project/refs/heads/main/api/spec/{{.API_SPEC_FILE}} -o old-{{.API_SPEC_FILE}}
+      cp {{.API_SPEC_FILE}} new-{{.API_SPEC_FILE}}
+      docker run --rm -v $(pwd):/workspace -w /workspace openapitools/openapi-diff:latest -fail-on-incompatible old-{{.API_SPEC_FILE}} new-{{.API_SPEC_FILE}}
+
   setup-backend:
     desc: "Setup backend"
     cmds:

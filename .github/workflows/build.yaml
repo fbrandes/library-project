@@ -26,7 +26,6 @@ jobs:
           fetch-depth: 0
       - id: detect
         shell: bash
-        working-directory: .cicd
         run: |
           pwd
           task --list

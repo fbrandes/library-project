@@ -36,7 +36,7 @@ jobs:
         api-spec:
           - bookinfo.yml
           - renting.yml
-          - user-management.yml
+          - user-management.json
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
