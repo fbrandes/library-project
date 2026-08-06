@@ -26,6 +26,7 @@ jobs:
         uses: arduino/setup-task@v2
         with:
           version: 3.x
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Run Super Linter
         run: task lint
   check-api-compatibility:
@@ -45,6 +46,7 @@ jobs:
         uses: arduino/setup-task@v2
         with:
           version: 3.x
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Check API compatibility
         working-directory: .cicd
         env:
