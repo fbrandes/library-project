@@ -1,6 +1,7 @@
 name: Build changed services
 
-permissions: { }
+permissions:
+  contents: read
 
 on:
   push:
