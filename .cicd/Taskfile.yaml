@@ -30,9 +30,9 @@ tasks:
   detect-changed-services:
     desc: "Determine which services have changes"
     vars:
-      BASE:
+      BASE_SHA:
         sh: git ls-remote -q | grep refs/heads/main | awk '{print $1}' | xargs git rev-parse --short
-      HEAD:
+      HEAD_SHA:
         sh: git rev-parse HEAD
     cmds:
       - ./scripts/detect_changed_services.sh "{{.BASE_SHA}}" "{{.HEAD_SHA}}" bookinfo gateway renting user-management
@@ -42,6 +42,6 @@ tasks:
     vars:
       API_SPEC_FILE: "default.yml"
     cmd: |
-      curl -H "Authorization: token {{.GH_TOKEN}}" -sL https://raw.githubusercontent.com/fbrandes/library-project/refs/heads/main/api/specs/{{.API_SPEC_FILE}} -o old.yaml
-      cp api/specs/{{.API_SPEC_FILE}} new.yaml
+      curl -H "Authorization: token {{.GH_TOKEN}}" -sL https://raw.githubusercontent.com/fbrandes/library-project/refs/heads/main/api/spec/{{.API_SPEC_FILE}} -o old.yaml
+      cp api/spec/{{.API_SPEC_FILE}} new.yaml
       docker run --rm -v ${pwd}:/workspace -w /workspace openapitools/openapi-diff:latest -fail-on-incompatible old.yaml new.yaml
