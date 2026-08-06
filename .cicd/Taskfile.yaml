@@ -39,9 +39,7 @@ tasks:
 
   open-api-diff:
     desc: "Run openapi-diff"
-    vars:
-      API_SPEC_FILE: "default.yml"
     cmd: |
-      curl -H "Authorization: token {{.GH_TOKEN}}" -sL https://raw.githubusercontent.com/fbrandes/library-project/refs/heads/main/api/spec/{{.API_SPEC_FILE}} -o old.yaml
-      cp api/spec/{{.API_SPEC_FILE}} new.yaml
-      docker run --rm -v ${pwd}:/workspace -w /workspace openapitools/openapi-diff:latest -fail-on-incompatible old.yaml new.yaml
+      curl -sL https://raw.githubusercontent.com/fbrandes/library-project/refs/heads/main/api/spec/{{.API_SPEC_FILE}} -o old.yaml
+      cp ../api/spec/{{.API_SPEC_FILE}} new.yaml
+      docker run --rm -v $(pwd):/workspace -w /workspace openapitools/openapi-diff:latest -fail-on-incompatible old.yaml new.yaml

@@ -47,6 +47,8 @@ jobs:
           version: 3.x
       - name: Check API compatibility
         working-directory: .cicd
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           pwd
           task --list
