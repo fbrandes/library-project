@@ -25,11 +25,12 @@ jobs:
         with:
           fetch-depth: 0
       - id: detect
+        working-directory: .cicd
         shell: bash
         run: |
           pwd
           task --list
-          result="$(task cicd:detect-changed-services)"
+          result="$(task detect-changed-services)"
           echo "has_changes=$(printf '%s' "$result" | jq -r '.has_changes')" >> "$GITHUB_OUTPUT"
           echo "matrix=$(printf '%s' "$result" | jq -c '.matrix')" >> "$GITHUB_OUTPUT"
 

@@ -50,7 +50,4 @@ jobs:
       - name: Check API compatibility
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          pwd
-          task --list
-          task cicd:open-api-diff API_SPEC_FILE=${{matrix.api-spec}}
+        run: task cicd:open-api-diff API_SPEC_FILE=${{matrix.api-spec}}
