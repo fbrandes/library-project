@@ -14,8 +14,7 @@ tasks:
       - task: user-management:build
 
   build-service:
-    cmds:
-      - ./scripts/build_service.sh "{{.SERVICE}}"
+    cmd: task $SERVICE:build
 
   check-pull-request:
     desc: "Run Pull Request Checks"
@@ -40,7 +39,7 @@ tasks:
   open-api-diff:
     desc: "Run openapi-diff"
     vars:
-      API_SPEC_FILE: "bookinfo.yml"
+      API_SPEC_FILE: "default.yml"
     cmd: |
       curl -H "Authorization: token {{.GH_TOKEN}}" -sL https://raw.githubusercontent.com/fbrandes/library-project/refs/heads/main/api/specs/{{.API_SPEC_FILE}} -o old.yaml
       cp api/specs/{{.API_SPEC_FILE}} new.yaml
