@@ -28,6 +28,7 @@ tasks:
     desc: "TODO"
 
   detect-changed-services:
+    desc: "Determine which services have changes"
     vars:
       BASE:
         sh: git ls-remote -q | grep refs/heads/main | awk '{print $1}' | xargs git rev-parse --short
