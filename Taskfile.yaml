@@ -2,11 +2,23 @@ version: "3"
 
 includes:
   bookinfo: ./bookinfo
+  cicd: .cicd
   gateway: ./gateway
   renting: ./renting
   user-management: ./user-management
 
 tasks:
+  build-app:
+    desc: "Builds all components of the Library Application"
+    cmds:
+      - task: bookinfo:build
+      - task: gateway:build
+      - task: renting:build
+      - task: user-management:build
+
+  build-service:
+    cmd: task $SERVICE:build
+
   lint:
     desc: Lints the whole project
     dir: .
@@ -51,14 +63,6 @@ tasks:
       -e VALIDATE_YAML_PRETTIER=false \
       -v "{{.ROOT_DIR}}:/tmp/lint" \
       ghcr.io/super-linter/super-linter:latest
-
-  open-api-diff:
-    desc: "Run openapi-diff"
-    dir: api/spec
-    cmd: |
-      curl -sL https://raw.githubusercontent.com/fbrandes/library-project/refs/heads/main/api/spec/{{.API_SPEC_FILE}} -o old-{{.API_SPEC_FILE}}
-      cp {{.API_SPEC_FILE}} new-{{.API_SPEC_FILE}}
-      docker run --rm -v $(pwd):/workspace -w /workspace openapitools/openapi-diff:latest -fail-on-incompatible old-{{.API_SPEC_FILE}} new-{{.API_SPEC_FILE}}
 
   setup-backend:
     desc: "Setup backend"

@@ -1,29 +1,6 @@
 version: "3"
 
-includes:
-  app:
-    taskfile: ../Taskfile.yaml
-
 tasks:
-  build-app:
-    desc: "Builds all components of the Library Application"
-    cmds:
-      - task: bookinfo:build
-      - task: gateway:build
-      - task: renting:build
-      - task: user-management:build
-
-  build-service:
-    cmd: task $SERVICE:build
-
-  check-pull-request:
-    desc: "Run Pull Request Checks"
-    cmds:
-      - task: lint
-      - task: build-app
-      - task: validate-helm-charts
-      - task: check-api-compatibility
-
   deploy-app:
     desc: "TODO"
 
@@ -36,3 +13,11 @@ tasks:
         sh: git rev-parse HEAD
     cmds:
       - ./scripts/detect_changed_services.sh "{{.BASE_SHA}}" "{{.HEAD_SHA}}" bookinfo gateway renting user-management
+
+  open-api-diff:
+    desc: "Run openapi-diff"
+    dir: api/spec
+    cmd: |
+      curl -sL https://raw.githubusercontent.com/fbrandes/library-project/refs/heads/main/api/spec/{{.API_SPEC_FILE}} -o old-{{.API_SPEC_FILE}}
+      cp {{.API_SPEC_FILE}} new-{{.API_SPEC_FILE}}
+      docker run --rm -v $(pwd):/workspace -w /workspace openapitools/openapi-diff:latest -fail-on-incompatible old-{{.API_SPEC_FILE}} new-{{.API_SPEC_FILE}}
