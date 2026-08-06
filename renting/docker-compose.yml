@@ -6,7 +6,7 @@ services:
     environment:
       RENTING_ADDR: ":8080"
       RENTING_DATABASE_DRIVER: pgx
-      RENTING_DATABASE_URL: postgres://renting:renting@renting-postgres:5432/renting?sslmode=disable
+      RENTING_DATABASE_URL: host=renting-postgres port=5432 user=renting password=renting dbname=renting sslmode=disable
       RENTING_AUTO_MIGRATE: "true"
     ports:
       - "8082:8080"

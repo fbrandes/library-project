@@ -45,6 +45,3 @@ tasks:
       curl -H "Authorization: token {{.GH_TOKEN}}" -sL https://raw.githubusercontent.com/fbrandes/library-project/refs/heads/main/api/specs/{{.API_SPEC_FILE}} -o old.yaml
       cp api/specs/{{.API_SPEC_FILE}} new.yaml
       docker run --rm -v ${pwd}:/workspace -w /workspace openapitools/openapi-diff:latest -fail-on-incompatible old.yaml new.yaml
-
-
-

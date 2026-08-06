@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"log/slog"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -37,7 +38,7 @@ func TestRouterHealthAndCORS(t *testing.T) {
 
 func TestRouterOrderLifecycle(t *testing.T) {
 	router := newTestRouter()
-	input := order.OrderInput{
+	input := order.Input{
 		UserID:   "user-123",
 		Contents: []order.Book{testBook()},
 	}
@@ -92,7 +93,7 @@ func TestRouterBadRequests(t *testing.T) {
 		t.Fatalf("expected invalid json 400, got %d", invalidJSON.Code)
 	}
 
-	invalidPayload := performJSON(router, http.MethodPost, "/orders", order.OrderInput{})
+	invalidPayload := performJSON(router, http.MethodPost, "/orders", order.Input{})
 	if invalidPayload.Code != http.StatusBadRequest {
 		t.Fatalf("expected invalid payload 400, got %d", invalidPayload.Code)
 	}
@@ -105,7 +106,7 @@ func TestRouterBadRequests(t *testing.T) {
 
 func TestRouterServiceErrors(t *testing.T) {
 	validOrderID := "550e8400-e29b-41d4-a716-446655440000"
-	validInput := order.OrderInput{
+	validInput := order.Input{
 		UserID:   "user-123",
 		Contents: []order.Book{testBook()},
 	}
@@ -145,7 +146,9 @@ func newTestRouter() http.Handler {
 func performJSON(router http.Handler, method string, path string, body any) *httptest.ResponseRecorder {
 	var payload bytes.Buffer
 	if body != nil {
-		_ = json.NewEncoder(&payload).Encode(body)
+		if err := json.NewEncoder(&payload).Encode(body); err != nil {
+			slog.Error("failed to write JSON response", "err", err)
+		}
 	}
 
 	request := httptest.NewRequest(method, path, &payload)

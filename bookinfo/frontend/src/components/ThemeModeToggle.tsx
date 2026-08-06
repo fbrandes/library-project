@@ -1,16 +1,16 @@
-import DarkModeIcon from '@mui/icons-material/DarkMode';
-import LightModeIcon from '@mui/icons-material/LightMode';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Stack from '@mui/material/Stack';
-import Switch from '@mui/material/Switch';
-import Typography from '@mui/material/Typography';
+import DarkModeIcon from "@mui/icons-material/DarkMode";
+import LightModeIcon from "@mui/icons-material/LightMode";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Stack from "@mui/material/Stack";
+import Switch from "@mui/material/Switch";
+import Typography from "@mui/material/Typography";
 
-import { useBookInfoStore } from '../stores/bookInfoStore';
+import { useBookInfoStore } from "../stores/bookInfoStore";
 
 export function ThemeModeToggle() {
   const themeMode = useBookInfoStore((state) => state.themeMode);
   const toggleThemeMode = useBookInfoStore((state) => state.toggleThemeMode);
-  const isDarkMode = themeMode === 'dark';
+  const isDarkMode = themeMode === "dark";
 
   return (
     <FormControlLabel
@@ -20,14 +20,18 @@ export function ThemeModeToggle() {
           onChange={toggleThemeMode}
           slotProps={{
             input: {
-              'aria-label': 'Toggle dark mode',
+              "aria-label": "Toggle dark mode",
             },
           }}
         />
       }
       label={
-        <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-          {isDarkMode ? <DarkModeIcon fontSize="small" /> : <LightModeIcon fontSize="small" />}
+        <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
+          {isDarkMode ? (
+            <DarkModeIcon fontSize="small" />
+          ) : (
+            <LightModeIcon fontSize="small" />
+          )}
           <Typography variant="body2">Dark mode</Typography>
         </Stack>
       }

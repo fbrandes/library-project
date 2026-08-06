@@ -15,19 +15,19 @@ var (
 	ErrNotFound     = errors.New("order not found")
 )
 
-type OrderState string
+type State string
 
 const (
-	StatePlaced         OrderState = "PLACED"
-	StateProcessed      OrderState = "PROCESSED"
-	StateReadyForPickup OrderState = "READY_FOR_PICKUP"
-	StatePickedUp       OrderState = "PICKED_UP"
-	StateReturned       OrderState = "RETURNED"
-	StateCompleted      OrderState = "COMPLETED"
-	StateLateForReturn  OrderState = "LATE_FOR_RETURN"
+	StatePlaced         State = "PLACED"
+	StateProcessed      State = "PROCESSED"
+	StateReadyForPickup State = "READY_FOR_PICKUP"
+	StatePickedUp       State = "PICKED_UP"
+	StateReturned       State = "RETURNED"
+	StateCompleted      State = "COMPLETED"
+	StateLateForReturn  State = "LATE_FOR_RETURN"
 )
 
-var validOrderStates = map[OrderState]struct{}{
+var validOrderStates = map[State]struct{}{
 	StatePlaced:         {},
 	StateProcessed:      {},
 	StateReadyForPickup: {},
@@ -79,18 +79,18 @@ type Book struct {
 }
 
 type Order struct {
-	ID         string     `json:"id"`
-	UserID     string     `json:"userId"`
-	PlacedAt   time.Time  `json:"placedAt"`
-	Contents   []Book     `json:"contents"`
-	RentEndsAt time.Time  `json:"rentEndsAt"`
-	State      OrderState `json:"state"`
+	ID         string    `json:"id"`
+	UserID     string    `json:"userId"`
+	PlacedAt   time.Time `json:"placedAt"`
+	Contents   []Book    `json:"contents"`
+	RentEndsAt time.Time `json:"rentEndsAt"`
+	State      State     `json:"state"`
 }
 
-type OrderInput struct {
-	UserID   string     `json:"userId"`
-	Contents []Book     `json:"contents"`
-	State    OrderState `json:"state,omitempty"`
+type Input struct {
+	UserID   string `json:"userId"`
+	Contents []Book `json:"contents"`
+	State    State  `json:"state,omitempty"`
 }
 
 type ValidationError struct {
@@ -105,16 +105,16 @@ func (e ValidationError) Unwrap() error {
 	return ErrInvalidOrder
 }
 
-func (s OrderState) Normalize() OrderState {
-	return OrderState(strings.ToUpper(strings.TrimSpace(string(s))))
+func (s State) Normalize() State {
+	return State(strings.ToUpper(strings.TrimSpace(string(s))))
 }
 
-func (s OrderState) Valid() bool {
+func (s State) Valid() bool {
 	_, ok := validOrderStates[s.Normalize()]
 	return ok
 }
 
-func (s OrderState) ActiveRental() bool {
+func (s State) ActiveRental() bool {
 	switch s.Normalize() {
 	case StateReturned, StateCompleted:
 		return false
@@ -123,7 +123,7 @@ func (s OrderState) ActiveRental() bool {
 	}
 }
 
-func (input OrderInput) Normalize(defaultState OrderState) OrderInput {
+func (input Input) Normalize(defaultState State) Input {
 	normalized := input
 	normalized.UserID = strings.TrimSpace(input.UserID)
 	normalized.State = input.State.Normalize()
@@ -133,7 +133,7 @@ func (input OrderInput) Normalize(defaultState OrderState) OrderInput {
 	return normalized
 }
 
-func (input OrderInput) Validate(defaultState OrderState) error {
+func (input Input) Validate(defaultState State) error {
 	normalized := input.Normalize(defaultState)
 	var problems []string
 

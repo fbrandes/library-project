@@ -1,21 +1,23 @@
-import Box from '@mui/material/Box';
-import Container from '@mui/material/Container';
-import Paper from '@mui/material/Paper';
-import Stack from '@mui/material/Stack';
-import Typography from '@mui/material/Typography';
-import { useEffect, useMemo } from 'react';
+import Box from "@mui/material/Box";
+import Container from "@mui/material/Container";
+import Paper from "@mui/material/Paper";
+import Stack from "@mui/material/Stack";
+import Typography from "@mui/material/Typography";
+import { useEffect, useMemo } from "react";
 
-import { filterBooks, useBookInfoStore } from '../stores/bookInfoStore';
-import { BookList } from './BookList';
-import { FilterBar } from './FilterBar';
-import { SearchBar } from './SearchBar';
-import { ThemeModeToggle } from './ThemeModeToggle';
+import { filterBooks, useBookInfoStore } from "../stores/bookInfoStore";
+import { BookList } from "./BookList";
+import { FilterBar } from "./FilterBar";
+import { SearchBar } from "./SearchBar";
+import { ThemeModeToggle } from "./ThemeModeToggle";
 
 interface BookInfoWorkspaceProps {
   embedded?: boolean;
 }
 
-export function BookInfoWorkspace({ embedded = false }: BookInfoWorkspaceProps) {
+export function BookInfoWorkspace({
+  embedded = false,
+}: BookInfoWorkspaceProps) {
   const books = useBookInfoStore((state) => state.books);
   const error = useBookInfoStore((state) => state.error);
   const filterField = useBookInfoStore((state) => state.filterField);
@@ -39,16 +41,25 @@ export function BookInfoWorkspace({ embedded = false }: BookInfoWorkspaceProps) 
   }, [loadBooks]);
 
   return (
-    <Box sx={{ bgcolor: 'background.default', minHeight: embedded ? 'auto' : '100vh' }}>
-      <Container disableGutters={embedded} maxWidth="lg" sx={{ py: embedded ? 0 : { xs: 3, md: 5 } }}>
+    <Box
+      sx={{
+        bgcolor: "background.default",
+        minHeight: embedded ? "auto" : "100vh",
+      }}
+    >
+      <Container
+        disableGutters={embedded}
+        maxWidth="lg"
+        sx={{ py: embedded ? 0 : { xs: 3, md: 5 } }}
+      >
         <Stack spacing={3}>
           <Stack
             component="header"
-            direction={{ xs: 'column', sm: 'row' }}
+            direction={{ xs: "column", sm: "row" }}
             spacing={2}
             sx={{
-              alignItems: { xs: 'stretch', sm: 'center' },
-              justifyContent: 'space-between',
+              alignItems: { xs: "stretch", sm: "center" },
+              justifyContent: "space-between",
             }}
           >
             <Typography component="h1" variant="h4">

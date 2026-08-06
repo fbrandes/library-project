@@ -3,6 +3,7 @@ package httpapi
 import (
 	"encoding/json"
 	"errors"
+	"log/slog"
 	"net/http"
 
 	"github.com/example/bookstore/renting/backend/internal/order"
@@ -26,7 +27,7 @@ func NewRouter(service *order.Service) http.Handler {
 	return withCORS(mux)
 }
 
-func (h *Handler) health(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) health(w http.ResponseWriter, _ *http.Request) {
 	writeJSON(w, http.StatusOK, map[string]string{"status": "ok"})
 }
 
@@ -89,16 +90,16 @@ func (h *Handler) deleteOrder(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
-func decodeOrderInput(w http.ResponseWriter, r *http.Request) (order.OrderInput, bool) {
+func decodeOrderInput(w http.ResponseWriter, r *http.Request) (order.Input, bool) {
 	defer r.Body.Close()
 
-	var input order.OrderInput
+	var input order.Input
 	decoder := json.NewDecoder(http.MaxBytesReader(w, r.Body, 1<<20))
 	decoder.DisallowUnknownFields()
 
 	if err := decoder.Decode(&input); err != nil {
 		writeError(w, http.StatusBadRequest, "invalid JSON payload")
-		return order.OrderInput{}, false
+		return order.Input{}, false
 	}
 
 	return input, true
@@ -120,7 +121,10 @@ func writeServiceError(w http.ResponseWriter, err error) {
 func writeJSON(w http.ResponseWriter, status int, body any) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
-	_ = json.NewEncoder(w).Encode(body)
+
+	if err := json.NewEncoder(w).Encode(body); err != nil {
+		slog.Error("failed to write JSON response", "err", err)
+	}
 }
 
 func writeError(w http.ResponseWriter, status int, message string) {

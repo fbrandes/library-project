@@ -4,10 +4,18 @@ import { Pool } from "pg";
 export const USER_MANAGEMENT_POOL = Symbol("USER_MANAGEMENT_POOL");
 
 export function getDatabaseUrl(env: NodeJS.ProcessEnv = process.env): string {
-  return (
-    env.USER_MANAGEMENT_DATABASE_URL ??
-    "postgres://user_management:user_management@localhost:5434/user_management"
-  );
+  if (env.USER_MANAGEMENT_DATABASE_URL) {
+    return env.USER_MANAGEMENT_DATABASE_URL;
+  }
+
+  const databaseUrl = new URL("postgres://localhost");
+  databaseUrl.hostname = env.USER_MANAGEMENT_DATABASE_HOST ?? "localhost";
+  databaseUrl.port = env.USER_MANAGEMENT_DATABASE_PORT ?? "5434";
+  databaseUrl.username = env.USER_MANAGEMENT_DATABASE_USER ?? "user_management";
+  databaseUrl.password =
+    env.USER_MANAGEMENT_DATABASE_PASSWORD ?? "user_management";
+  databaseUrl.pathname = env.USER_MANAGEMENT_DATABASE_NAME ?? "user_management";
+  return databaseUrl.toString();
 }
 
 export const poolProvider = {

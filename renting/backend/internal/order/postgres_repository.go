@@ -160,7 +160,7 @@ func scanOrder(scanner rowScanner) (Order, error) {
 		return Order{}, err
 	}
 
-	item.State = OrderState(state)
+	item.State = State(state)
 
 	if err := json.Unmarshal(contents, &item.Contents); err != nil {
 		return Order{}, fmt.Errorf("unmarshal order contents: %w", err)

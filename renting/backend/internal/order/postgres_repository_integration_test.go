@@ -31,62 +31,41 @@ func TestSQLRepositoryIntegrationOrderLifecycle(t *testing.T) {
 	newer.Contents[1].ISBN = "9780132350884"
 	newer.Contents[1].Title = "Clean Code"
 
-	if _, err := repository.Create(ctx, older); err != nil {
-		t.Fatalf("create older order: %v", err)
-	}
-	if _, err := repository.Create(ctx, newer); err != nil {
-		t.Fatalf("create newer order: %v", err)
-	}
+	mustCreateOrder(ctx, t, repository, older)
+	mustCreateOrder(ctx, t, repository, newer)
 
-	orders, err := repository.List(ctx)
-	if err != nil {
-		t.Fatalf("list orders: %v", err)
-	}
-	if len(orders) != 2 {
-		t.Fatalf("expected 2 orders, got %d", len(orders))
-	}
-	if orders[0].ID != newer.ID || orders[1].ID != older.ID {
-		t.Fatalf("expected orders newest first, got %+v", orders)
-	}
+	orders := mustListOrders(ctx, t, repository)
+	assertOrderOrdering(t, orders, newer, older)
+
 	if !reflect.DeepEqual(orders[0].Contents, newer.Contents) {
 		t.Fatalf("expected JSONB contents round trip, got %+v", orders[0].Contents)
 	}
 
-	got, err := repository.Get(ctx, older.ID)
-	if err != nil {
-		t.Fatalf("get older order: %v", err)
-	}
-	if got.ID != older.ID || got.UserID != older.UserID || got.State != older.State {
-		t.Fatalf("unexpected fetched order: %+v", got)
-	}
+	got := mustGetOrder(ctx, t, repository, older.ID)
+	assertOrderFields(t, got, older)
 
 	older.UserID = "user-456"
 	older.State = StateReadyForPickup
 	older.Contents[0].Title = "Updated Go Services"
-	updated, err := repository.Update(ctx, older)
-	if err != nil {
-		t.Fatalf("update older order: %v", err)
+
+	updated := mustUpdateOrder(ctx, t, repository, older)
+
+	if updated.UserID != older.UserID {
+		t.Fatalf("expected user %q, got %q", older.UserID, updated.UserID)
 	}
-	if updated.UserID != "user-456" || updated.State != StateReadyForPickup {
-		t.Fatalf("unexpected updated order: %+v", updated)
+	if updated.State != older.State {
+		t.Fatalf("expected state %q, got %q", older.State, updated.State)
 	}
 
-	got, err = repository.Get(ctx, older.ID)
-	if err != nil {
-		t.Fatalf("get updated order: %v", err)
-	}
+	got = mustGetOrder(ctx, t, repository, older.ID)
+
 	if got.Contents[0].Title != "Updated Go Services" {
 		t.Fatalf("expected updated contents, got %+v", got.Contents)
 	}
 
-	if err := repository.Delete(ctx, older.ID); err != nil {
-		t.Fatalf("delete older order: %v", err)
-	}
-	if _, err := repository.Get(ctx, older.ID); !errors.Is(err, ErrNotFound) {
-		t.Fatalf("expected deleted order to be missing, got %v", err)
-	}
+	mustDeleteOrder(ctx, t, repository, older.ID)
+	assertOrderNotFound(ctx, t, repository, older.ID)
 }
-
 func TestSQLRepositoryIntegrationNotFound(t *testing.T) {
 	repository, _ := newPostgresRepository(t)
 	ctx := context.Background()
@@ -173,4 +152,90 @@ func newPostgresRepository(t *testing.T) (*SQLRepository, *sql.DB) {
 	}
 
 	return repository, db
+}
+
+func mustCreateOrder(ctx context.Context, t *testing.T, repo *SQLRepository, order Order) {
+	t.Helper()
+
+	if _, err := repo.Create(ctx, order); err != nil {
+		t.Fatalf("create order %q: %v", order.ID, err)
+	}
+}
+
+func mustListOrders(ctx context.Context, t *testing.T, repo *SQLRepository) []Order {
+	t.Helper()
+
+	orders, err := repo.List(ctx)
+	if err != nil {
+		t.Fatalf("list orders: %v", err)
+	}
+
+	return orders
+}
+
+func mustGetOrder(ctx context.Context, t *testing.T, repo *SQLRepository, id string) Order {
+	t.Helper()
+
+	order, err := repo.Get(ctx, id)
+	if err != nil {
+		t.Fatalf("get order %q: %v", id, err)
+	}
+
+	return order
+}
+
+func mustUpdateOrder(ctx context.Context, t *testing.T, repo *SQLRepository, order Order) Order {
+	t.Helper()
+
+	updated, err := repo.Update(ctx, order)
+	if err != nil {
+		t.Fatalf("update order %q: %v", order.ID, err)
+	}
+
+	return updated
+}
+
+func mustDeleteOrder(ctx context.Context, t *testing.T, repo *SQLRepository, id string) {
+	t.Helper()
+
+	if err := repo.Delete(ctx, id); err != nil {
+		t.Fatalf("delete order %q: %v", id, err)
+	}
+}
+
+func assertOrderNotFound(ctx context.Context, t *testing.T, repo *SQLRepository, id string) {
+	t.Helper()
+
+	_, err := repo.Get(ctx, id)
+	if !errors.Is(err, ErrNotFound) {
+		t.Fatalf("expected ErrNotFound, got %v", err)
+	}
+}
+
+func assertOrderOrdering(t *testing.T, orders []Order, newer, older Order) {
+	t.Helper()
+
+	if len(orders) != 2 {
+		t.Fatalf("expected 2 orders, got %d", len(orders))
+	}
+
+	if orders[0].ID != newer.ID || orders[1].ID != older.ID {
+		t.Fatalf("expected newest-first ordering, got %+v", orders)
+	}
+}
+
+func assertOrderFields(t *testing.T, got, want Order) {
+	t.Helper()
+
+	if got.ID != want.ID {
+		t.Fatalf("expected ID %q, got %q", want.ID, got.ID)
+	}
+
+	if got.UserID != want.UserID {
+		t.Fatalf("expected UserID %q, got %q", want.UserID, got.UserID)
+	}
+
+	if got.State != want.State {
+		t.Fatalf("expected State %q, got %q", want.State, got.State)
+	}
 }

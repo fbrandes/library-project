@@ -27,7 +27,7 @@
       "enabled": true,
       "protocol": "openid-connect",
       "publicClient": false,
-      "secret": "local-oauth2-proxy-secret",
+      "secret": "local-secret",
       "standardFlowEnabled": true,
       "directAccessGrantsEnabled": true,
       "redirectUris": [

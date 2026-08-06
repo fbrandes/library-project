@@ -10,6 +10,11 @@
       "url": "http://localhost:8083"
     }
   ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
   "paths": {
     "/users": {
       "post": {
@@ -159,6 +164,13 @@
     }
   },
   "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
     "parameters": {
       "UserId": {
         "name": "id",
@@ -282,6 +294,7 @@
           },
           "problems": {
             "type": "array",
+            "maxItems": 100,
             "items": {
               "type": "string"
             }

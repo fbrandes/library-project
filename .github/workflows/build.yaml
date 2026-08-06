@@ -1,5 +1,7 @@
 name: Build changed services
 
+permissions: { }
+
 on:
   push:
     branches: [main]

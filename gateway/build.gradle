@@ -1,8 +1,9 @@
 plugins {
-    id 'java'
-    alias(libs.plugins.springBoot)
-    alias(libs.plugins.springDependencyManagement)
-    id 'jacoco'
+  id 'java'
+  alias(libs.plugins.springBoot)
+  alias(libs.plugins.springDependencyManagement)
+  id 'jacoco'
+  alias(libs.plugins.ktlint)
 }
 
 group = 'com.example.bookstore'
@@ -10,65 +11,65 @@ version = '0.0.1-SNAPSHOT'
 description = 'Bookstore edge gateway'
 
 java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(25)
-    }
+  toolchain {
+    languageVersion = JavaLanguageVersion.of(25)
+  }
 }
 
 ext {
-    set('springCloudVersion', libs.versions.springCloud.get())
+  set('springCloudVersion', '2025.1.2')
 }
 
 dependencyManagement {
-    imports {
-        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-    }
+  imports {
+    mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+  }
 }
 
 dependencies {
-    implementation libs.springBootStarterActuator
-    implementation libs.springBootStarterOauth2ResourceServer
-    implementation libs.springBootStarterSecurity
-    implementation libs.springCloudStarterGatewayServerWebflux
+  implementation libs.springBootStarterActuator
+  implementation libs.springBootStarterOauth2ResourceServer
+  implementation libs.springBootStarterSecurity
+  implementation libs.springCloudStarterGatewayServerWebflux
 
-    testImplementation libs.mockWebServer
-    testImplementation libs.reactorTest
-    testImplementation libs.springBootStarterTest
-    testImplementation libs.springBootStarterWebfluxTest
-    testImplementation libs.springSecurityTest
-    testRuntimeOnly libs.junitPlatformLauncher
+  testImplementation libs.mockWebServer
+  testImplementation libs.reactorTest
+  testImplementation libs.springBootStarterTest
+  testImplementation libs.springBootStarterWebfluxTest
+  testImplementation libs.springSecurityTest
+  testRuntimeOnly libs.junitPlatformLauncher
 }
 
 tasks.withType(Test).configureEach {
-    useJUnitPlatform()
-    finalizedBy tasks.named('jacocoTestReport')
+  useJUnitPlatform()
+  finalizedBy tasks.named('jacocoTestReport')
 }
 
 tasks.named('jacocoTestReport') {
-    reports {
-        xml.required = true
-        html.required = true
-    }
+  reports {
+    xml.required = true
+    html.required = true
+  }
 }
 
 tasks.named('jacocoTestCoverageVerification', JacocoCoverageVerification).configure {
-    dependsOn tasks.named('test')
-    violationRules {
-        rule {
-            limit {
-                counter = 'LINE'
-                value = 'COVEREDRATIO'
-                minimum = 0.9
-            }
-            limit {
-                counter = 'BRANCH'
-                value = 'COVEREDRATIO'
-                minimum = 0.9
-            }
-        }
+  dependsOn tasks.named('test')
+  violationRules {
+    rule {
+      limit {
+        counter = 'LINE'
+        value = 'COVEREDRATIO'
+        minimum = 0.9
+      }
+      limit {
+        counter = 'BRANCH'
+        value = 'COVEREDRATIO'
+        minimum = 0.9
+      }
     }
+  }
 }
 
 tasks.named('check') {
-    dependsOn tasks.named('jacocoTestCoverageVerification')
+  dependsOn tasks.named('jacocoTestCoverageVerification')
 }

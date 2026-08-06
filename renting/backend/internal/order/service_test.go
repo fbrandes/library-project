@@ -12,7 +12,7 @@ func TestServiceCreateSetsOrderFields(t *testing.T) {
 	now := time.Date(2026, 6, 22, 9, 30, 45, 99, time.UTC)
 	service := NewService(NewMemoryRepository(), func() time.Time { return now })
 
-	created, err := service.Create(ctx, OrderInput{
+	created, err := service.Create(ctx, Input{
 		UserID:   "user-123",
 		Contents: []Book{testBook()},
 	})
@@ -37,7 +37,7 @@ func TestServiceCreateSetsOrderFields(t *testing.T) {
 func TestServiceCreateRejectsInvalidInput(t *testing.T) {
 	service := NewService(NewMemoryRepository(), nil)
 
-	if _, err := service.Create(context.Background(), OrderInput{}); err == nil {
+	if _, err := service.Create(context.Background(), Input{}); err == nil {
 		t.Fatalf("expected invalid order")
 	}
 }
@@ -48,7 +48,7 @@ func TestServiceCreateReturnsRepositoryError(t *testing.T) {
 		return time.Date(2026, 6, 22, 9, 30, 45, 0, time.UTC)
 	})
 
-	_, err := service.Create(context.Background(), OrderInput{
+	_, err := service.Create(context.Background(), Input{
 		UserID:   "user-123",
 		Contents: []Book{testBook()},
 	})
@@ -103,7 +103,7 @@ func TestServiceUpdatePreservesPlacementDates(t *testing.T) {
 	repository := NewMemoryRepository(testOrder())
 	service := NewService(repository, nil)
 
-	updated, err := service.Update(ctx, testOrderID, OrderInput{
+	updated, err := service.Update(ctx, testOrderID, Input{
 		UserID:   "user-456",
 		Contents: []Book{testBook()},
 		State:    StateReadyForPickup,
@@ -132,7 +132,7 @@ func TestServiceUpdateDefaultsExistingState(t *testing.T) {
 	existing.State = StateProcessed
 	service := NewService(NewMemoryRepository(existing), nil)
 
-	updated, err := service.Update(ctx, existing.ID, OrderInput{
+	updated, err := service.Update(ctx, existing.ID, Input{
 		UserID:   existing.UserID,
 		Contents: existing.Contents,
 	})
@@ -148,7 +148,7 @@ func TestServiceUpdateReturnsRepositoryGetError(t *testing.T) {
 	getErr := errors.New("get failed")
 	service := NewService(&stubRepository{getErr: getErr}, nil)
 
-	_, err := service.Update(context.Background(), testOrderID, OrderInput{
+	_, err := service.Update(context.Background(), testOrderID, Input{
 		UserID:   "user-123",
 		Contents: []Book{testBook()},
 	})
@@ -160,7 +160,7 @@ func TestServiceUpdateReturnsRepositoryGetError(t *testing.T) {
 func TestServiceUpdateRejectsInvalidInputAfterLoadingExistingOrder(t *testing.T) {
 	service := NewService(&stubRepository{get: testOrder()}, nil)
 
-	_, err := service.Update(context.Background(), testOrderID, OrderInput{})
+	_, err := service.Update(context.Background(), testOrderID, Input{})
 	if !errors.Is(err, ErrInvalidOrder) {
 		t.Fatalf("expected invalid order, got %v", err)
 	}
@@ -171,7 +171,7 @@ func TestServiceUpdateReturnsInvalidUpdatedOrder(t *testing.T) {
 	existing.RentEndsAt = existing.PlacedAt.Add(-time.Hour)
 	service := NewService(&stubRepository{get: existing}, nil)
 
-	_, err := service.Update(context.Background(), testOrderID, OrderInput{
+	_, err := service.Update(context.Background(), testOrderID, Input{
 		UserID:   "user-123",
 		Contents: []Book{testBook()},
 		State:    StatePlaced,
@@ -185,7 +185,7 @@ func TestServiceUpdateReturnsRepositoryUpdateError(t *testing.T) {
 	updateErr := errors.New("update failed")
 	service := NewService(&stubRepository{get: testOrder(), updateErr: updateErr}, nil)
 
-	_, err := service.Update(context.Background(), testOrderID, OrderInput{
+	_, err := service.Update(context.Background(), testOrderID, Input{
 		UserID:   "user-123",
 		Contents: []Book{testBook()},
 		State:    StateProcessed,

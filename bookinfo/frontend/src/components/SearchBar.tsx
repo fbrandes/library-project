@@ -1,14 +1,14 @@
-import SearchIcon from '@mui/icons-material/Search';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import FormControl from '@mui/material/FormControl';
-import InputLabel from '@mui/material/InputLabel';
-import NativeSelect from '@mui/material/NativeSelect';
-import OutlinedInput from '@mui/material/OutlinedInput';
-import Stack from '@mui/material/Stack';
-import type { ChangeEvent, FormEvent } from 'react';
+import SearchIcon from "@mui/icons-material/Search";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import NativeSelect from "@mui/material/NativeSelect";
+import OutlinedInput from "@mui/material/OutlinedInput";
+import Stack from "@mui/material/Stack";
+import type { ChangeEvent, FormEvent } from "react";
 
-import type { SearchField } from '../types/book';
+import type { SearchField } from "../types/book";
 
 interface SearchBarProps {
   field: SearchField;
@@ -20,9 +20,9 @@ interface SearchBarProps {
 }
 
 const searchFields: Array<{ label: string; value: SearchField }> = [
-  { label: 'ISBN', value: 'isbn' },
-  { label: 'Title', value: 'title' },
-  { label: 'Author', value: 'author' },
+  { label: "ISBN", value: "isbn" },
+  { label: "Title", value: "title" },
+  { label: "Author", value: "author" },
 ];
 
 export function SearchBar({
@@ -44,13 +44,16 @@ export function SearchBar({
 
   return (
     <Box component="form" noValidate onSubmit={handleSubmit}>
-      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-        <FormControl sx={{ minWidth: { xs: '100%', sm: 152 } }} variant="standard">
+      <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
+        <FormControl
+          sx={{ minWidth: { xs: "100%", sm: 152 } }}
+          variant="standard"
+        >
           <InputLabel htmlFor="search-field">Search by</InputLabel>
           <NativeSelect
             inputProps={{
-              'aria-label': 'Search by',
-              id: 'search-field',
+              "aria-label": "Search by",
+              id: "search-field",
             }}
             onChange={handleFieldChange}
             value={field}
@@ -76,7 +79,7 @@ export function SearchBar({
         <Button
           disabled={isLoading}
           startIcon={<SearchIcon />}
-          sx={{ minHeight: 56, minWidth: { xs: '100%', sm: 132 } }}
+          sx={{ minHeight: 56, minWidth: { xs: "100%", sm: 132 } }}
           type="submit"
           variant="contained"
         >

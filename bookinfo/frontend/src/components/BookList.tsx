@@ -1,10 +1,10 @@
-import Alert from '@mui/material/Alert';
-import Box from '@mui/material/Box';
-import CircularProgress from '@mui/material/CircularProgress';
-import Stack from '@mui/material/Stack';
+import Alert from "@mui/material/Alert";
+import Box from "@mui/material/Box";
+import CircularProgress from "@mui/material/CircularProgress";
+import Stack from "@mui/material/Stack";
 
-import type { Book } from '../types/book';
-import { BookCard } from './BookCard';
+import type { Book } from "../types/book";
+import { BookCard } from "./BookCard";
 
 interface BookListProps {
   books: Book[];
@@ -15,7 +15,11 @@ interface BookListProps {
 export function BookList({ books, error, isLoading }: BookListProps) {
   if (isLoading) {
     return (
-      <Stack aria-label="Loading books" role="status" sx={{ alignItems: 'center', py: 6 }}>
+      <Stack
+        aria-label="Loading books"
+        role="status"
+        sx={{ alignItems: "center", py: 6 }}
+      >
         <CircularProgress />
       </Stack>
     );
@@ -33,11 +37,11 @@ export function BookList({ books, error, isLoading }: BookListProps) {
     <Box
       aria-label="Book results"
       sx={{
-        display: 'grid',
+        display: "grid",
         gap: 2,
         gridTemplateColumns: {
-          xs: '1fr',
-          md: 'repeat(2, minmax(0, 1fr))',
+          xs: "1fr",
+          md: "repeat(2, minmax(0, 1fr))",
         },
       }}
     >

@@ -1,14 +1,14 @@
-import FilterListIcon from '@mui/icons-material/FilterList';
-import FormControl from '@mui/material/FormControl';
-import InputAdornment from '@mui/material/InputAdornment';
-import InputLabel from '@mui/material/InputLabel';
-import NativeSelect from '@mui/material/NativeSelect';
-import OutlinedInput from '@mui/material/OutlinedInput';
-import Stack from '@mui/material/Stack';
-import Typography from '@mui/material/Typography';
-import type { ChangeEvent } from 'react';
+import FilterListIcon from "@mui/icons-material/FilterList";
+import FormControl from "@mui/material/FormControl";
+import InputAdornment from "@mui/material/InputAdornment";
+import InputLabel from "@mui/material/InputLabel";
+import NativeSelect from "@mui/material/NativeSelect";
+import OutlinedInput from "@mui/material/OutlinedInput";
+import Stack from "@mui/material/Stack";
+import Typography from "@mui/material/Typography";
+import type { ChangeEvent } from "react";
 
-import type { FilterField } from '../types/book';
+import type { FilterField } from "../types/book";
 
 interface FilterBarProps {
   field: FilterField;
@@ -19,8 +19,8 @@ interface FilterBarProps {
 }
 
 const filterFields: Array<{ label: string; value: FilterField }> = [
-  { label: 'Title', value: 'title' },
-  { label: 'Author', value: 'author' },
+  { label: "Title", value: "title" },
+  { label: "Author", value: "author" },
 ];
 
 export function FilterBar({
@@ -36,16 +36,19 @@ export function FilterBar({
 
   return (
     <Stack
-      direction={{ xs: 'column', md: 'row' }}
+      direction={{ xs: "column", md: "row" }}
       spacing={2}
-      sx={{ alignItems: { xs: 'stretch', md: 'center' } }}
+      sx={{ alignItems: { xs: "stretch", md: "center" } }}
     >
-      <FormControl sx={{ minWidth: { xs: '100%', md: 152 } }} variant="standard">
+      <FormControl
+        sx={{ minWidth: { xs: "100%", md: 152 } }}
+        variant="standard"
+      >
         <InputLabel htmlFor="filter-field">Filter by</InputLabel>
         <NativeSelect
           inputProps={{
-            'aria-label': 'Filter by',
-            id: 'filter-field',
+            "aria-label": "Filter by",
+            id: "filter-field",
           }}
           onChange={handleFieldChange}
           value={field}
@@ -73,8 +76,12 @@ export function FilterBar({
         />
       </FormControl>
 
-      <Typography color="text.secondary" sx={{ whiteSpace: 'nowrap' }} variant="body2">
-        {resultCount} {resultCount === 1 ? 'book' : 'books'}
+      <Typography
+        color="text.secondary"
+        sx={{ whiteSpace: "nowrap" }}
+        variant="body2"
+      >
+        {resultCount} {resultCount === 1 ? "book" : "books"}
       </Typography>
     </Stack>
   );

@@ -6,7 +6,7 @@ This repository contains the user management microservice. It is divided into tw
 
 ## Project Structure
 
-- `backend/`: NodeJS + Postgres
+- `backend/`: Node.js + Postgres
 - `frontend/`: Vue w/ with Vite
 
 ## Build, Test and Development Commands

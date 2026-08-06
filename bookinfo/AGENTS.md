@@ -46,33 +46,39 @@ When assisting with code generation or modifications, adhere to the following ru
 
 ### Backend (Java) Development Rules
 
-1. **API & Controllers**
-   - **Do NOT** create DTOs manually. Use classes generated from OpenAPI `.yaml` specifications (located in `src/generated/kotlin`).
-   - Implement generated interfaces (e.g., `*Api`) in `@RestController` classes.
-   - Controllers handle HTTP routing, DTO mapping, and delegate business logic to Services.
+#### API & Controllers
 
-2. **Dependency Injection & Architecture**
-   - Fields should be `private final`.
-   - **Do NOT** use `@Autowired` or setter injection.
-   - **Services**: Contain business logic, use `@Transactional`, and throw custom exceptions.
-   - **Repositories**: Spring Data JPA interfaces extending `JpaRepository`. No implementation classes.
+- **Do NOT** create DTOs manually. Use classes generated from OpenAPI `.yaml` specifications (located in
+  `src/generated/kotlin`).
+- Implement generated interfaces (e.g., `*Api`) in `@RestController` classes.
+- Controllers handle HTTP routing, DTO mapping, and delegate business logic to Services.
 
-3. **Persistence (Hibernate / JPA)**
-   - Entities use `@Entity`, `@Table`, `@Id`, `@Column`.
-   - **Do NOT** put business logic inside entities.
-   - Repository methods should follow Spring Data naming conventions (e.g., `findBy[Property]And[Property]`).
+#### Dependency Injection & Architecture
 
-4. **Mapping & Utilities**
-   - Use **MapStruct** for mapping. Configure it with `componentModel = "spring"`.
-   - Inject Mappers into Services to convert between Entities and Generated DTOs.
-   - Use `Optional.orElseThrow()` for handling nulls in Streams/Repositories.
-   - Use Lombok extensively (`@Data`, `@Slf4j`, `@Builder`).
+- Fields should be `private final`.
+- **Do NOT** use `@Autowired` or setter injection.
+- **Services**: Contain business logic, use `@Transactional`, and throw custom exceptions.
+- **Repositories**: Spring Data JPA interfaces extending `JpaRepository`. No implementation classes.
 
-5. **Testing**
-   - Framework: JUnit 5 & Mockito.
-   - Use annotations: `@ExtendWith(MockitoExtension::class)`, `@Mock`, `@InjectMocks`.
-   - Naming convention: `should[Behavior]_when[Condition]`.
-   - Use `org.junit.jupiter.api.Assertions` for assertions.
+#### Persistence (Hibernate / JPA)
+
+- Entities use `@Entity`, `@Table`, `@Id`, `@Column`.
+- **Do NOT** put business logic inside entities.
+- Repository methods should follow Spring Data naming conventions (e.g., `findBy[Property]And[Property]`).
+
+#### Mapping & Utilities
+
+- Use **MapStruct** for mapping. Configure it with `componentModel = "spring"`.
+- Inject Mappers into Services to convert between Entities and Generated DTOs.
+- Use `Optional.orElseThrow()` for handling nulls in Streams/Repositories.
+- Use Lombok extensively (`@Data`, `@Slf4j`, `@Builder`).
+
+#### Testing
+
+- Framework: JUnit 5 & Mockito.
+- Use annotations: `@ExtendWith(MockitoExtension::class)`, `@Mock`, `@InjectMocks`.
+- Naming convention: `should[Behavior]_when[Condition]`.
+- Use `org.junit.jupiter.api.Assertions` for assertions.
 
 ## Workflow
 

@@ -28,4 +28,7 @@ USER 1001:1001
 
 EXPOSE 8080
 
+HEALTHCHECK --interval=30s --timeout=3s --start-period=30s --retries=3 \
+    CMD bash -c 'exec 3<>/dev/tcp/127.0.0.1/8080' || exit 1
+
 ENTRYPOINT ["java", "-jar", "/app/bookinfo.jar"]

@@ -26,6 +26,11 @@ RUN corepack enable \
 
 COPY --from=build /workspace/user-management/backend/dist dist
 
+USER node
+
 EXPOSE 8080
+
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD node -e "require('node:http').get('http://127.0.0.1:8080/users/healthcheck',response=>process.exit(response.statusCode<500?0:1)).on('error',()=>process.exit(1))"
 
 CMD ["node", "dist/main.js"]

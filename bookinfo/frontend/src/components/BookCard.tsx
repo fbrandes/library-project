@@ -1,11 +1,11 @@
-import Box from '@mui/material/Box';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import Chip from '@mui/material/Chip';
-import Stack from '@mui/material/Stack';
-import Typography from '@mui/material/Typography';
+import Box from "@mui/material/Box";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import Chip from "@mui/material/Chip";
+import Stack from "@mui/material/Stack";
+import Typography from "@mui/material/Typography";
 
-import { getAuthorDisplayName, type Book } from '../types/book';
+import { getAuthorDisplayName, type Book } from "../types/book";
 
 interface BookCardProps {
   book: Book;
@@ -25,10 +25,18 @@ export function BookCard({ book }: BookCardProps) {
             </Typography>
           </Stack>
 
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
             <Chip label={`ISBN ${book.isbn}`} size="small" variant="outlined" />
-            <Chip label={`${book.pages} pages`} size="small" variant="outlined" />
-            <Chip label={`${book.edition}. edition`} size="small" variant="outlined" />
+            <Chip
+              label={`${book.pages} pages`}
+              size="small"
+              variant="outlined"
+            />
+            <Chip
+              label={`${book.edition}. edition`}
+              size="small"
+              variant="outlined"
+            />
             <Chip label={book.type} size="small" variant="outlined" />
             <Chip label={book.language} size="small" variant="outlined" />
           </Box>
@@ -40,7 +48,7 @@ export function BookCard({ book }: BookCardProps) {
           <Typography variant="body2">{book.summary}</Typography>
 
           <Typography color="text.secondary" variant="body2">
-            {book.genres.join(', ')}
+            {book.genres.join(", ")}
           </Typography>
         </Stack>
       </CardContent>

@@ -2,11 +2,11 @@
 
 ## Project Overview
 
-This repository contains the api gateway microservice. It is written in Java w/ Spring Cloud Gateway
+This repository contains the API gateway microservice. It is written in Java w/ Spring Cloud Gateway
 
 ## Project Structure
 
-- `src/`: The api gateway code
+- `src/`: The API gateway code
 - `keycloak/`: Configs for Keycloak
 - `oauth2-proxy/`: Configs for Oauth2 Proxy
 

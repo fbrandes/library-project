@@ -1,4 +1,4 @@
-import { BookInfoWorkspace } from './components/BookInfoWorkspace';
+import { BookInfoWorkspace } from "./components/BookInfoWorkspace";
 
 export default function App() {
   return <BookInfoWorkspace />;

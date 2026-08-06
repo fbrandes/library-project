@@ -43,7 +43,7 @@ func (s *Service) Get(ctx context.Context, id string) (Order, error) {
 	return s.repository.Get(ctx, id)
 }
 
-func (s *Service) Create(ctx context.Context, input OrderInput) (Order, error) {
+func (s *Service) Create(ctx context.Context, input Input) (Order, error) {
 	if err := input.Validate(StatePlaced); err != nil {
 		return Order{}, err
 	}
@@ -71,7 +71,7 @@ func (s *Service) Create(ctx context.Context, input OrderInput) (Order, error) {
 	return s.repository.Create(ctx, created)
 }
 
-func (s *Service) Update(ctx context.Context, id string, input OrderInput) (Order, error) {
+func (s *Service) Update(ctx context.Context, id string, input Input) (Order, error) {
 	if err := ValidateID(id); err != nil {
 		return Order{}, err
 	}

@@ -2,9 +2,9 @@ name: Pull Request
 
 on:
   pull_request:
-    types: [ opened, reopened, synchronize ]
+    types: [opened, reopened, synchronize]
   push:
-    branches: [ main ]
+    branches: [main]
 
 permissions:
   checks: write
@@ -23,8 +23,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          submodules: 'recursive'
-          token: '${{ steps.app-token.outputs.token }}'
+          submodules: "recursive"
+          token: "${{ steps.app-token.outputs.token }}"
       - name: Install Task
         uses: arduino/setup-task@v2
         with:
@@ -43,8 +43,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          submodules: 'recursive'
-          token: '${{ steps.app-token.outputs.token }}'
+          submodules: "recursive"
+          token: "${{ steps.app-token.outputs.token }}"
       - name: Check API compatibility
         run: task open-api-diff API_SPEC_FILE=${{matrix.api-spec}}
-

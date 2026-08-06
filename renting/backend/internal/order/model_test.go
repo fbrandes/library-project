@@ -53,13 +53,13 @@ func TestOrderStateNormalizeValidAndActiveRental(t *testing.T) {
 	if StatePlaced.Normalize() != StatePlaced {
 		t.Fatalf("expected already-normalized state to stay unchanged")
 	}
-	if OrderState(" picked_up ").Normalize() != StatePickedUp {
+	if State(" picked_up ").Normalize() != StatePickedUp {
 		t.Fatalf("expected state normalization to trim and uppercase")
 	}
-	if !OrderState("processed").Valid() {
+	if !State("processed").Valid() {
 		t.Fatalf("expected processed to be valid")
 	}
-	if OrderState("missing").Valid() {
+	if State("missing").Valid() {
 		t.Fatalf("expected missing to be invalid")
 	}
 	if StateCompleted.ActiveRental() {
@@ -83,7 +83,7 @@ func TestBookTypeValid(t *testing.T) {
 }
 
 func TestOrderInputValidateDefaultsState(t *testing.T) {
-	input := OrderInput{
+	input := Input{
 		UserID:   " user-123 ",
 		Contents: []Book{testBook()},
 	}
@@ -102,7 +102,7 @@ func TestOrderInputValidateDefaultsState(t *testing.T) {
 }
 
 func TestOrderInputValidateReportsProblems(t *testing.T) {
-	input := OrderInput{
+	input := Input{
 		UserID: " ",
 		Contents: []Book{{
 			ISBN:    "",
@@ -112,7 +112,7 @@ func TestOrderInputValidateReportsProblems(t *testing.T) {
 			Edition: 0,
 			Type:    BookType("BAD"),
 		}},
-		State: OrderState("BAD"),
+		State: State("BAD"),
 	}
 
 	err := input.Validate(StatePlaced)

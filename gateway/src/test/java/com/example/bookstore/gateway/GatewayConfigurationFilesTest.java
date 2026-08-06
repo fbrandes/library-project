@@ -35,7 +35,7 @@ class GatewayConfigurationFilesTest {
                 .contains("provider = \"keycloak-oidc\"")
                 .contains("oidc_issuer_url = \"http://keycloak:8080/realms/library\"")
                 .contains("client_id = \"oauth2-proxy\"")
-                .contains("client_secret = \"local-oauth2-proxy-secret\"")
+                .contains("client_secret = \"local-secret\"")
                 .contains("redirect_url = \"http://localhost:4180/oauth2/callback\"")
                 .contains("set_authorization_header = true")
                 .contains("pass_access_token = true")
@@ -51,7 +51,7 @@ class GatewayConfigurationFilesTest {
                 .contains("\"clientId\": \"gateway-resource-server\"")
                 .contains("\"bearerOnly\": true")
                 .contains("\"clientId\": \"oauth2-proxy\"")
-                .contains("\"secret\": \"local-oauth2-proxy-secret\"")
+                .contains("\"secret\": \"local-secret\"")
                 .contains("\"http://localhost:4180/oauth2/callback\"")
                 .contains("\"username\": \"local-user\"")
                 .contains("\"value\": \"local-password\"");

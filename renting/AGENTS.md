@@ -43,7 +43,7 @@ When assisting with code generation or modifications, adhere to the following ru
 
 ### Backend Development Rules
 
-- prefer golang std library over external dependencies
+- prefer Go standard library over external dependencies
 
 ## Workflow
 

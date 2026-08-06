@@ -7,63 +7,79 @@ includes:
   user-management: ./user-management
 
 tasks:
-    lint:
-        desc: Lints the whole project
-        dir: .
-        cmd: |
-            docker run --rm \
-            -e LOG_LEVEL=DEBUG \
-            -e RUN_LOCAL=true \
-            -e LINTER_RULES_PATH=.cicd/linters \
-            -e IGNORE_GENERATED_FILES=true \
-            -e IGNORE_GITIGNORED_FILES=true \
-            -e FILTER_REGEX_EXCLUDE=.*/gradlew.* \
-            -e JAVA_FILE_NAME=checkstyle.xml \
-            -e LOG_LEVEL=NOTICE \
-            -e SQLFLUFF_CONFIG_FILE=/.sqlfluff \
-            -e YAML_CONFIG_FILE=.yaml-lint.yaml \
-            -e VALIDATE_ALL_CODEBASE=true \
-            -e VALIDATE_PYTHON_BLACK=false
-            -e VALIDATE_BIOME_FORMAT=false \
-            -e VALIDATE_BIOME_LINT=false \
-            -e VALIDATE_GITHUB_ACTIONS=false \
-            -e VALIDATE_GITHUB_ACTIONS_ZIZMOR=false \
-            -e VALIDATE_GIT_COMMITLINT=false \
-            -e VALIDATE_GOOGLE_JAVA_FORMAT=false \
-            -e VALIDATE_JSCPD=false \
-            -e VALIDATE_TRIVY=false \
-            -v .:/tmp/lint \
-            ghcr.io/super-linter/super-linter:latest
+  lint:
+    desc: Lints the whole project
+    dir: .
+    cmd: |
+      docker run --rm \
+      -e RUN_LOCAL=true \
+      -e DEFAULT_BRANCH=main \
+      -e FILTER_REGEX_EXCLUDE='(^|/)(\.agents/skills/.*?|.cicd/linters(/.*)?|pnpm-lock.yaml(/.*)?|node_modules(/.*)?|gradlew(\.bat)?|gradle/wrapper/.*)$' \
+      -e IGNORE_GENERATED_FILES=true \
+      -e IGNORE_GITIGNORED_FILES=true \
+      -e JAVA_FILE_NAME=checkstyle.xml \
+      -e LINTER_RULES_PATH=.cicd/linters \
+      -e LOG_LEVEL=NOTICE \
+      -e OUTPUT_DETAILS=detailed \
+      -e SQLFLUFF_CONFIG_FILE=/.sqlfluff \
+      -e YAML_CONFIG_FILE=.yaml-lint.yaml \
+      -e VALIDATE_ALL_CODEBASE=true \
+      -e VALIDATE_BIOME_FORMAT=false \
+      -e VALIDATE_BIOME_LINT=false \
+      -e VALIDATE_GITHUB_ACTIONS=false \
+      -e VALIDATE_GITHUB_ACTIONS_ZIZMOR=false \
+      -e VALIDATE_GIT_COMMITLINT=false \
+      -e VALIDATE_GO=false \
+      -e VALIDATE_GO_MODULES=false \
+      -e VALIDATE_GOOGLE_JAVA_FORMAT=false \
+      -e VALIDATE_JAVASCRIPT_ES=false \
+      -e VALIDATE_JAVASCRIPT_PRETTIER=false \
+      -e VALIDATE_JSCPD=false \
+      -e VALIDATE_JSON=false \
+      -e VALIDATE_JSON_PRETTIER=false \
+      -e VALIDATE_KOTLIN=false \
+      -e VALIDATE_OPENAPI=false \
+      -e VALIDATE_PYTHON_BLACK=false \
+      -e VALIDATE_SPELL_CODESPELL=false \
+      -e VALIDATE_TRIVY=false \
+      -e VALIDATE_TSX=false \
+      -e VALIDATE_TYPESCRIPT_ES=false \
+      -e VALIDATE_TYPESCRIPT_PRETTIER=false \
+      -e VALIDATE_VUE=false \
+      -e VALIDATE_VUE_PRETTIER=false \
+      -e VALIDATE_YAML=false \
+      -e VALIDATE_YAML_PRETTIER=false \
+      -v "{{.ROOT_DIR}}:/tmp/lint" \
+      ghcr.io/super-linter/super-linter:latest
 
-    setup-backend:
-      desc: "Setup backend"
-      cmds:
-        - task: setup-java
-        - task: setup-gradle
+  setup-backend:
+    desc: "Setup backend"
+    cmds:
+      - task: setup-java
+      - task: setup-gradle
 
-    setup-frontend:
-      desc: "Setup frontend"
-      deps: [setup-node]
+  setup-frontend:
+    desc: "Setup frontend"
+    deps: [setup-node]
 
-    setup-gradle:
-      deps: [ setup-java ]
-      desc: "Setup Gradle"
-      cmds:
-        - curl -s "https://get.sdkman.io" | bash
-        - sdk install gradle
+  setup-gradle:
+    deps: [setup-java]
+    desc: "Setup Gradle"
+    cmds:
+      - curl -s "https://get.sdkman.io" | bash
+      - sdk install gradle
 
-    setup-java:
-      desc: "Setup Java"
-      cmds:
-        - curl -s "https://get.sdkman.io" | bash
-        - sdk install 25.0.3-tem
+  setup-java:
+    desc: "Setup Java"
+    cmds:
+      - curl -s "https://get.sdkman.io" | bash
+      - sdk install 25.0.3-tem
 
-    setup-node:
-      desc: "Setup Node"
-      cmds:
-        - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.5/install.sh | bash
-        - \. "$HOME/.nvm/nvm.sh"
-        - nvm install 26
-        - node -v
-        - npm -v
-
+  setup-node:
+    desc: "Setup Node"
+    cmds:
+      - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.5/install.sh | bash
+      - \. "$HOME/.nvm/nvm.sh"
+      - nvm install 26
+      - node -v
+      - npm -v
