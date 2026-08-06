@@ -28,8 +28,6 @@ jobs:
         working-directory: .cicd
         shell: bash
         run: |
-          pwd
-          task --list
           result="$(task detect-changed-services)"
           echo "has_changes=$(printf '%s' "$result" | jq -r '.has_changes')" >> "$GITHUB_OUTPUT"
           echo "matrix=$(printf '%s' "$result" | jq -c '.matrix')" >> "$GITHUB_OUTPUT"
