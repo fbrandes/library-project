@@ -16,10 +16,13 @@ jobs:
       matrix: ${{ steps.detect.outputs.matrix }}
 
     steps:
+      - name: Install Task
+        uses: arduino/setup-task@v2
+        with:
+          version: 3.x
       - uses: actions/checkout@v5
         with:
           fetch-depth: 0
-
       - id: detect
         shell: bash
         run: |
@@ -36,8 +39,11 @@ jobs:
       matrix: ${{ fromJSON(needs.detect.outputs.matrix) }}
 
     steps:
+      - name: Install Task
+        uses: arduino/setup-task@v2
+        with:
+          version: 3.x
       - uses: actions/checkout@v5
         with:
           fetch-depth: 0
-
       - run: task app:${{ matrix.service }}:build
