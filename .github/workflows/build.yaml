@@ -1,6 +1,7 @@
 name: Build changed services
 
-permissions: { }
+permissions:
+  contents: read
 
 on:
   push:
@@ -15,13 +16,20 @@ jobs:
       matrix: ${{ steps.detect.outputs.matrix }}
 
     steps:
+      - name: Install Task
+        uses: arduino/setup-task@v2
+        with:
+          version: 3.x
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/checkout@v5
         with:
           fetch-depth: 0
-
       - id: detect
+        working-directory: .cicd
         shell: bash
         run: |
+          pwd
+          task --list
           result="$(task detect-changed-services)"
           echo "has_changes=$(printf '%s' "$result" | jq -r '.has_changes')" >> "$GITHUB_OUTPUT"
           echo "matrix=$(printf '%s' "$result" | jq -c '.matrix')" >> "$GITHUB_OUTPUT"
@@ -35,8 +43,12 @@ jobs:
       matrix: ${{ fromJSON(needs.detect.outputs.matrix) }}
 
     steps:
+      - name: Install Task
+        uses: arduino/setup-task@v2
+        with:
+          version: 3.x
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/checkout@v5
         with:
           fetch-depth: 0
-
-      - run: task app:${{ matrix.service }}:build
+      - run: task ${{ matrix.service }}:build

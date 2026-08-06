@@ -2,11 +2,23 @@ version: "3"
 
 includes:
   bookinfo: ./bookinfo
+  cicd: .cicd
   gateway: ./gateway
   renting: ./renting
   user-management: ./user-management
 
 tasks:
+  build-app:
+    desc: "Builds all components of the Library Application"
+    cmds:
+      - task: bookinfo:build
+      - task: gateway:build
+      - task: renting:build
+      - task: user-management:build
+
+  build-service:
+    cmd: task $SERVICE:build
+
   lint:
     desc: Lints the whole project
     dir: .

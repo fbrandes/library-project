@@ -3,8 +3,6 @@ name: Pull Request
 on:
   pull_request:
     types: [opened, reopened, synchronize]
-  push:
-    branches: [main]
 
 permissions:
   checks: write
@@ -21,14 +19,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
-          submodules: "recursive"
-          token: "${{ steps.app-token.outputs.token }}"
+          fetch-depth: 0
       - name: Install Task
         uses: arduino/setup-task@v2
         with:
           version: 3.x
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Run Super Linter
         run: task lint
   check-api-compatibility:
@@ -38,12 +36,18 @@ jobs:
         api-spec:
           - bookinfo.yml
           - renting.yml
-          - user-management.yml
+          - user-management.json
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
-          submodules: "recursive"
-          token: "${{ steps.app-token.outputs.token }}"
+          fetch-depth: 0
+      - name: Install Task
+        uses: arduino/setup-task@v2
+        with:
+          version: 3.x
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Check API compatibility
-        run: task open-api-diff API_SPEC_FILE=${{matrix.api-spec}}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: task cicd:open-api-diff API_SPEC_FILE=${{matrix.api-spec}}
